@@ -29,6 +29,10 @@ abstract TestResult(Surprise<Noise, Error>) from Surprise<Noise, Error> to Surpr
 		return v.map(function(r) return Success(r));
 	
 	@:from
+	public static inline function ofFutureAssert(v:Future<Assert>):TestResult
+		return v >> function(assert:Assert) return Success(assert);
+	
+	@:from
 	public static inline function ofUnsafeAssert(v:Surprise<Assert, Error>):TestResult
 		return v >> function(assert:Assert) return assert;
 	#end

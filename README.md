@@ -1,3 +1,8 @@
+# Tink Unit Test Framework
+
+## Usage
+
+```haxe
 import tink.unit.TestRunner.*;
 import tink.unit.Assert.*;
 using tink.CoreApi;
@@ -58,3 +63,4 @@ class AwaitTest {
   function someAsyncValue() 
     return Future.async(function(cb) haxe.Timer.delay(function() cb('actual'), 1000));
 }
+```
