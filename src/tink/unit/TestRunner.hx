@@ -33,7 +33,11 @@ class TestRunner {
 						errors += r.errors.length;
 					}
 					log('\n$total Tests   ${total - errors} Success   $errors Errors\n');
-					cb(result);
+					cb({
+						total: total,
+						errors: errors,
+						details: result,
+					});
 				}
 			}
 			next();
@@ -83,7 +87,7 @@ class TestRunner {
 		});
 	}
 	
-	static function log(msg:String) {
+	public static function log(msg:String) {
 		#if travix
 			travix.Logger.println(msg);
 		#elseif js
@@ -93,7 +97,7 @@ class TestRunner {
 		#end
 	}
 	
-	static function exit(code:Int) {
+	public static function exit(code:Int) {
 		#if travix
 			travix.Logger.exit(code);
 		#elseif js
