@@ -8,7 +8,7 @@ typedef TestCase = {
 }
 
 typedef Test = {
-	description:String,
+	descriptions:Array<String>,
 	timeout:Int,
 	result:Lazy<TestResult>,
 }

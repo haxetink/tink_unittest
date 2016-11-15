@@ -26,8 +26,8 @@ class Macro {
 					for(field in cls.fields.get()) if(field.isPublic) {
 						var name = field.name;
 						var description = switch field.meta.extract(':describe') {
-							case []: name;
-							case v: [for(v in v) v.params[0].getString().sure()].join('\n');
+							case []: [macro $v{name}];
+							case v: [for(v in v) macro $v{v.params[0].getString().sure()}];
 						}
 						var timeout = switch field.meta.extract(':timeout') {
 							case []: 5000;
@@ -39,7 +39,7 @@ class Macro {
 							default: Context.fatalError('Multiple @:timeout meta', v.pos);
 						}
 						tests.push(macro ({
-							description: $v{description},
+							descriptions: $a{description},
 							timeout: $v{timeout},
 							result: function() return t.$name(),
 						}:tink.unit.TestCase.Test));

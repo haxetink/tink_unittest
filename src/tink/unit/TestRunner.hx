@@ -53,7 +53,8 @@ class TestRunner {
 				if(iter.hasNext()) {
 					total++;
 					var current = iter.next();
-					log('  ' + current.description);
+					for(desc in current.descriptions)
+						log('  $desc');
 					var timer = null;
 					var done = false;
 					var link = current.result.get().handle(function(o) {
