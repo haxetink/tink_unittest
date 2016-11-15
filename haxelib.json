@@ -1,0 +1,18 @@
+{
+  "name": "tink_unittest",
+  "license": "MIT",
+  "tags": [
+    "unit test",
+    "tink",
+    "cross"
+  ],
+  "classPath": "src",
+  "contributors": [
+    "kevinresol"
+  ],
+  "releasenote": "initial release",
+  "version": "0.0.0",
+  "dependencies": {
+    "tink_macro": ""
+  }
+}

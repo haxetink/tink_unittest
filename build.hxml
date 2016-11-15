@@ -1,0 +1,7 @@
+tests.hxml
+-js bin/node/tests.js
+-dce full
+
+-lib hxnodejs
+-lib travix
+-lib tink_unittest
