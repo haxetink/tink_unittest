@@ -15,6 +15,7 @@ typedef Test = {
 
 @:forward
 abstract TestResult(Surprise<Noise, Error>) from Surprise<Noise, Error> to Surprise<Noise, Error> {
+	#if !macro
 	@:from
 	public static inline function ofOutcome(v:Outcome<Noise, Error>):TestResult
 		return Future.sync(v);
@@ -26,4 +27,9 @@ abstract TestResult(Surprise<Noise, Error>) from Surprise<Noise, Error> to Surpr
 	@:from
 	public static inline function ofFuture(v:Future<Noise>):TestResult
 		return v.map(function(r) return Success(r));
+	
+	@:from
+	public static inline function ofUnsafeAssert(v:Surprise<Assert, Error>):TestResult
+		return v >> function(assert:Assert) return assert;
+	#end
 }
