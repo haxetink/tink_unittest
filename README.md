@@ -75,8 +75,8 @@ class AwaitTest {
 		var actual = @:await someAsyncValue();
 		return equals('expected', actual);
 	}
-  
-  function someAsyncValue() 
-    return Future.async(function(cb) haxe.Timer.delay(function() cb('actual'), 1000));
+	
+	function someAsyncValue() 
+		return Future.async(function(cb) haxe.Timer.delay(function() cb('actual'), 1000));
 }
 ```
