@@ -1,17 +1,8 @@
 package tink.unit;
 
 import haxe.macro.Expr;
-import tink.unit.TestCase;
 using tink.CoreApi;
 
-typedef Result = {
-	total:Int,
-	errors:Int,
-	details:Array<{
-		total:Int,
-		errors:Array<Error>
-	}>,
-}
 class TestRunner {
 	
 	public static macro function run(e:ExprOf<Array<Dynamic>>):ExprOf<Future<Result>>
@@ -170,4 +161,45 @@ class RunnerBase {
 	
 	public inline function asRunner():RunnerBase return this;
 	inline function log(msg) TestRunner.log(msg);
+}
+
+
+typedef Result = {
+	total:Int,
+	errors:Int,
+	details:Array<{
+		total:Int,
+		errors:Array<Error>
+	}>,
+}
+
+typedef Test = {
+	descriptions:Array<String>,
+	timeout:Int,
+	run:Void->{pos:haxe.PosInfos, result:TestResult},
+}
+
+@:forward
+abstract TestResult(Surprise<Noise, Error>) from Surprise<Noise, Error> to Surprise<Noise, Error> {
+	#if !macro
+	@:from
+	public static inline function ofOutcome(v:Outcome<Noise, Error>):TestResult
+		return Future.sync(v);
+		
+	@:from
+	public static inline function ofNoise(v:Noise):TestResult
+		return ofOutcome(Success(v));
+		
+	@:from
+	public static inline function ofFuture(v:Future<Noise>):TestResult
+		return v.map(function(r) return Success(r));
+	
+	@:from
+	public static inline function ofFutureAssert(v:Future<Assert>):TestResult
+		return (v:Surprise<Noise, Error>);
+	
+	@:from
+	public static inline function ofUnsafeAssert(v:Surprise<Assert, Error>):TestResult
+		return v >> function(assert:Assert) return assert;
+	#end
 }

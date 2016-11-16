@@ -27,4 +27,11 @@ abstract Assert(Outcome<Noise, Error>) from Outcome<Noise, Error> to Outcome<Noi
 			case Success(_): b;
 			case Failure(f): Failure(f);
 		}
+		
+	@:op(A||B)
+	public function or(b:Assert)
+		return switch this {
+			case Success(_): Success(Noise);
+			case Failure(f): b;
+		}
 }

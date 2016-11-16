@@ -74,10 +74,10 @@ class Macro {
 					pos.methodName = $v{field.name}; 
 					return {
 						pos: pos,
-						result: (test.$fname():tink.unit.TestCase.TestResult),
+						result: (test.$fname():tink.unit.TestRunner.TestResult),
 					}
 				})(),
-			}:tink.unit.TestCase.Test));
+			}:tink.unit.TestRunner.Test));
 		}
 		
 		var def = macro class $clsname extends tink.unit.TestRunner.RunnerBase {
