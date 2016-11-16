@@ -30,6 +30,15 @@ class Macro {
 			case [{params: [p]}]: p.getString().sure();
 			case v: Context.fatalError('Expected only one @:name metadata with exactly one parameter', v[0].pos);
 		}
+		var clstimeout = switch cls.meta.extract(':timeout') {
+			case []: 5000;
+			case [v]: switch v.params {
+					case [{expr: EConst(CInt(i))}]: Std.parseInt(i);
+					case [{pos: pos}]: Context.fatalError('Expected integer parameter for @:timeout', pos);
+					default: Context.fatalError('Expected exactly one parameter for @:timeout', v.pos);
+				}
+			case p: Context.fatalError('Multiple @:timeout meta', p[0].pos);
+		}
 		var ct = type.toComplex();
 		var tests = [
 			Startup => [],
@@ -58,12 +67,8 @@ class Macro {
 				case []: [macro $v{fname}];
 				case v: [for(v in v) macro $v{v.params[0].getString().sure()}];
 			}
-			var description = switch field.meta.extract(':describe') {
-				case []: [macro $v{fname}];
-				case v: [for(v in v) macro $v{v.params[0].getString().sure()}];
-			}
 			var timeout = switch field.meta.extract(':timeout') {
-				case []: 5000;
+				case []: clstimeout;
 				case [v]: switch v.params {
 						case [{expr: EConst(CInt(i))}]: Std.parseInt(i);
 						case [{pos: pos}]: Context.fatalError('Expected integer parameter for @:timeout', pos);

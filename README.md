@@ -2,6 +2,17 @@
 
 ## Usage
 
+Tag instance methods with metadata and pass them to `TestRunner.run()`
+
+Supported metadata:
+
+- `@:startup`: Run once before all tests
+- `@:before`: Run before each tests
+- `@:after`: Run after each tests
+- `@:shutdown`: Run once after all tests
+- `@:timeout(int)`: Set timeout (in ms), default: 5000 (you can also put this at class-level)
+- `@:describe(string)`: Set description of test, default: name of function
+
 ```haxe
 import tink.unit.TestRunner.*;
 import tink.unit.Assert.*;
@@ -20,6 +31,11 @@ class RunTests {
 
 class NormalTest {
 	public function new() {}
+	
+	@:before public function before() return Noise;
+	@:after public function after() return Noise;
+	@:startup public function startup() return Noise;
+	@:shutdown public function shutdown() return Noise;
 	
 	@:describe('Sync test')
 	public function sync()
