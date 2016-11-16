@@ -168,5 +168,6 @@ class RunnerBase {
 		});
 	}
 	
+	public inline function asRunner():RunnerBase return this;
 	inline function log(msg) TestRunner.log(msg);
 }

@@ -105,7 +105,7 @@ class Macro {
 				for(v in values) {
 					var type = Context.typeof(v);
 					var ct = type.toComplex();
-					expr.push(macro new tink.unit.TestRunner.Runner<$ct>($v));
+					expr.push(macro new tink.unit.TestRunner.Runner<$ct>($v).asRunner());
 				}
 				return macro {
 					var tests = $a{expr};
