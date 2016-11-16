@@ -71,46 +71,87 @@ class Runner<T> {}
 
 class RunnerBase {
 	public var name(default, null):String;
+	
+	var startups:Array<Test>;
+	var shutdowns:Array<Test>;
+	var befores:Array<Test>;
+	var afters:Array<Test>;
 	var tests:Array<Test>;
 	
+	var testing:Bool;
+	var errors:Array<Error>;
+	var total:Int;
+	
 	public function run() {
+		errors = [];
+		total = 0;
+		testing = false;
+		return _run(startups) >>
+			function(_) {
+				testing = true; 
+				return _run(tests, befores, afters);
+			} >>
+			function(_) {
+				testing = false; 
+				return _run(shutdowns);
+			} >>
+			function(_) return {total: total, errors: errors}
+	}
+	
+	public function _run(tests:Array<Test>, ?befores:Array<Test>, ?afters:Array<Test>):Future<Noise> {
+		if(befores == null) befores = [];
+		if(afters == null) afters = [];
 		return Future.async(function(cb) {
 			var iter = tests.iterator();
-			var errors = [];
-			var total = 0;
 			function next() {
 				if(iter.hasNext()) {
-					total++;
-					var current = iter.next();
-					for(desc in current.descriptions)
-						log('  $desc');
-					var timer = null;
-					var done = false;
-					var link = current.result.get().handle(function(o) {
-						switch o {
-							case Success(_): // ok
-							case Failure(f):
-								errors.push(f);
-								log('    ' + f.toString());
+					
+					function sub(tests) {
+						return Future.async(function(cb) {
+							var oldTesting = testing;
+							testing = false;
+							_run(tests).handle(function() {
+								testing = oldTesting;
+								cb(Noise);
+							});
+						});
+					}
+					
+					sub(befores).handle(function(o) {
+						// run test
+						var current = iter.next();
+						if(testing) {
+							total++;
+							for(desc in current.descriptions)
+								log('  $desc');
 						}
-						done = true;
-						if(timer != null) timer.stop();
-						next();
+						var timer = null;
+						var done = false;
+						var link = current.result().handle(function(o) {
+							switch o {
+								case Success(_): // ok
+								case Failure(f):
+									if(testing)
+										errors.push(f);
+									log('    ' + f.toString());
+							}
+							done = true;
+							if(timer != null) timer.stop();
+							sub(afters).handle(next);
+						});
+						
+						if(!done)
+							timer = haxe.Timer.delay(function() {
+								link.dissolve();
+								var error = new Error('Timeout after ${current.timeout}ms');
+								log('    ' + error.toString());
+								if(testing) errors.push(error);
+								sub(afters).handle(next);
+							}, current.timeout);
 					});
 					
-					if(!done)
-						timer = haxe.Timer.delay(function() {
-							link.dissolve();
-							var error = new Error('Timeout after ${current.timeout}ms');
-							log('    ' + error.toString());
-							errors.push(error);
-							next();
-						}, current.timeout);
 				} else {
-					cb({
-						total: total,
-						errors: errors,
-					});
+					cb(Noise);
 				}
 			}
 			next();

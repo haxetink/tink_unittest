@@ -31,9 +31,33 @@ class Macro {
 			case v: Context.fatalError('Expected only one @:name metadata with exactly one parameter', v[0].pos);
 		}
 		var ct = type.toComplex();
-		var tests = [];
-		for(field in cls.fields.get()) if(field.isPublic) {
+		var tests = [
+			Startup => [],
+			Shutdown => [],
+			Before => [],
+			After => [],
+			Test => [],
+		];
+		for(field in cls.fields.get()) if(field.isPublic && field.kind.match(FMethod(_))) {
 			var fname = field.name;
+			
+			var kind:Kind = null;
+			function checkKind(meta:String, k:Kind) switch field.meta.extract(meta) {
+				case []: // skip
+				case v: 
+					if(kind == null) kind = k
+					else Context.fatalError('Cannot declare @$meta and @:${Std.string(kind).toLowerCase()} on the same function', v[0].pos); 
+			}
+			checkKind(':startup', Startup);
+			checkKind(':shutdown', Shutdown);
+			checkKind(':before', Before);
+			checkKind(':after', After);
+			if(kind == null) kind = Test;
+			
+			var description = switch field.meta.extract(':describe') {
+				case []: [macro $v{fname}];
+				case v: [for(v in v) macro $v{v.params[0].getString().sure()}];
+			}
 			var description = switch field.meta.extract(':describe') {
 				case []: [macro $v{fname}];
 				case v: [for(v in v) macro $v{v.params[0].getString().sure()}];
@@ -47,7 +71,7 @@ class Macro {
 					}
 				case p: Context.fatalError('Multiple @:timeout meta', p[0].pos);
 			}
-			tests.push(macro @:pos(field.pos) ({
+			tests[kind].push(macro @:pos(field.pos) ({
 				descriptions: $a{description},
 				timeout: $v{timeout},
 				result: function() return test.$fname(),
@@ -59,7 +83,11 @@ class Macro {
 			public function new(test) {
 				this.test = test;
 				name = $v{tname};
-				tests = $a{tests};
+				startups = $a{tests[Startup]};
+				shutdowns = $a{tests[Shutdown]};
+				befores = $a{tests[Before]};
+				afters = $a{tests[After]};
+				tests = $a{tests[Test]};
 			}
 		}
 		def.pack = ['tink', 'unit'];
@@ -86,4 +114,12 @@ class Macro {
 		}
 		return macro null;
 	}
+}
+
+enum Kind {
+	Startup;
+	Shutdown;
+	Before;
+	After;
+	Test;
 }

@@ -4,13 +4,13 @@ using tink.CoreApi;
 
 typedef TestCase = {
 	name:String,
-	tests:Lazy<Array<Test>>,
+	tests:Void->Array<Test>,
 }
 
 typedef Test = {
 	descriptions:Array<String>,
 	timeout:Int,
-	result:Lazy<TestResult>,
+	result:Void->TestResult,
 }
 
 @:forward
