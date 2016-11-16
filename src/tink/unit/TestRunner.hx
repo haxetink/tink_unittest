@@ -8,18 +8,19 @@ class TestRunner {
 	public static macro function run(e:haxe.macro.Expr)
 		return Macro.run(e);
 		
-	public static function runAll(cases:Array<TestCase>) {
+	public static function runAll(runners:Array<RunnerBase>) {
 		log('');
 		return Future.async(function(cb) {
-			var iter = cases.iterator();
+			var iter = runners.iterator();
 			var result = [];
 			function next() {
 				if(iter.hasNext()) {
 					var current = iter.next(); 
-					log(current.name);
-					runCase(current.tests.get()).handle(function(o) {
+					var name = current.name; 
+					log(name);
+					current.run().handle(function(o) {
 						result.push({
-							name: current.name,
+							name: name,
 							total: o.total,
 							errors: o.errors,
 						});
@@ -44,7 +45,35 @@ class TestRunner {
 		});
 	}
 	
-	static function runCase(tests:Array<Test>) {
+	public static function log(msg:String) {
+		#if travix
+			travix.Logger.println(msg);
+		#elseif js
+			untyped console.log(msg);
+		#elseif sys
+			Sys.println(msg);
+		#end
+	}
+	
+	public static function exit(code:Int) {
+		#if travix
+			travix.Logger.exit(code);
+		#elseif js
+			// TODO;
+		#elseif sys
+			Sys.exit(code);
+		#end
+	}
+}
+
+#if !macro @:genericBuild(tink.unit.Macro.buildRunner()) #end
+class Runner<T> {}
+
+class RunnerBase {
+	public var name(default, null):String;
+	var tests:Array<Test>;
+	
+	public function run() {
 		return Future.async(function(cb) {
 			var iter = tests.iterator();
 			var errors = [];
@@ -88,23 +117,5 @@ class TestRunner {
 		});
 	}
 	
-	public static function log(msg:String) {
-		#if travix
-			travix.Logger.println(msg);
-		#elseif js
-			untyped console.log(msg);
-		#elseif sys
-			Sys.println(msg);
-		#end
-	}
-	
-	public static function exit(code:Int) {
-		#if travix
-			travix.Logger.exit(code);
-		#elseif js
-			// TODO;
-		#elseif sys
-			Sys.exit(code);
-		#end
-	}
+	inline function log(msg) TestRunner.log(msg);
 }

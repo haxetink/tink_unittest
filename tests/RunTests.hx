@@ -13,6 +13,7 @@ class RunTests {
 	}
 }
 
+@:name('Custom Test Name')
 class NormalTest {
 	public function new() {}
 	
