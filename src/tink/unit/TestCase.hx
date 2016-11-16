@@ -10,7 +10,7 @@ typedef TestCase = {
 typedef Test = {
 	descriptions:Array<String>,
 	timeout:Int,
-	result:Void->TestResult,
+	run:Void->{pos:haxe.PosInfos, result:TestResult},
 }
 
 @:forward

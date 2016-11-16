@@ -1,14 +1,23 @@
 package tink.unit;
 
+import haxe.macro.Expr;
 import tink.unit.TestCase;
 using tink.CoreApi;
 
+typedef Result = {
+	total:Int,
+	errors:Int,
+	details:Array<{
+		total:Int,
+		errors:Array<Error>
+	}>,
+}
 class TestRunner {
 	
-	public static macro function run(e:haxe.macro.Expr)
+	public static macro function run(e:ExprOf<Array<Dynamic>>):ExprOf<Future<Result>>
 		return Macro.run(e);
 		
-	public static function runAll(runners:Array<RunnerBase>) {
+	public static function runAll(runners:Array<RunnerBase>):Future<Result> {
 		log('');
 		return Future.async(function(cb) {
 			var iter = runners.iterator();
@@ -127,7 +136,8 @@ class RunnerBase {
 						}
 						var timer = null;
 						var done = false;
-						var link = current.result().handle(function(o) {
+						var run = current.run();
+						var link = run.result.handle(function(o) {
 							switch o {
 								case Success(_): // ok
 								case Failure(f):
@@ -143,7 +153,7 @@ class RunnerBase {
 						if(!done)
 							timer = haxe.Timer.delay(function() {
 								link.dissolve();
-								var error = new Error('Timeout after ${current.timeout}ms');
+								var error = new Error('Timeout after ${current.timeout}ms' #if !macro, run.pos #end);
 								log('    ' + error.toString());
 								if(testing) errors.push(error);
 								sub(afters).handle(next);

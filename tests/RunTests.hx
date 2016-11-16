@@ -6,10 +6,7 @@ class RunTests {
 	static function main() {
 		var normal = new NormalTest();
 		var await = new AwaitTest();
-		run([
-			normal,
-			await,
-		]).handle(function(result) {
+		run([normal, await]).handle(function(result) {
 			var code = result.errors;
 			// trace(normal.result);
 			// trace(await.result);
@@ -42,14 +39,14 @@ class NormalTest {
 	@:shutdown public function shutdown() return debug('d');
 	@:shutdown public function shutdown2() return debug('d2');
 		
-	@:describe('Sync test')
+	@:describe("Sync test")
 	public function sync() {
 		debug('sync');
 		return true ? Success(Noise) : Failure(new Error('Errored!'));
 	}
 
 
-	@:describe('Test using Assert')
+	@:describe('Sync test using Assert')
 	public function syncAssert() {
 		debug('syncAssert');
 		return isTrue(true);

@@ -2,7 +2,7 @@
 
 ## Usage
 
-Tag instance methods with metadata and pass them to `TestRunner.run()`
+Tag instance methods with metadata and pass test instances to `TestRunner.run()`
 
 Supported metadata:
 

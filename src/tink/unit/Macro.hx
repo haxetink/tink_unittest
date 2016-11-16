@@ -7,6 +7,7 @@ import haxe.macro.Type;
 #if macro
 using tink.MacroApi;
 #end
+using tink.CoreApi;
 using StringTools;
 
 class Macro {
@@ -25,20 +26,12 @@ class Macro {
 		var clsname = 'Runner_' + Context.signature(cls);
 		try return Context.getType('tink.unit.$clsname') catch(e:Dynamic) {}
 		
-		var tname = switch cls.meta.extract(':name') {
-			case []: cls.name;
-			case [{params: [p]}]: p.getString().sure();
-			case v: Context.fatalError('Expected only one @:name metadata with exactly one parameter', v[0].pos);
-		}
-		var clstimeout = switch cls.meta.extract(':timeout') {
-			case []: 5000;
-			case [v]: switch v.params {
-					case [{expr: EConst(CInt(i))}]: Std.parseInt(i);
-					case [{pos: pos}]: Context.fatalError('Expected integer parameter for @:timeout', pos);
-					default: Context.fatalError('Expected exactly one parameter for @:timeout', v.pos);
-				}
-			case p: Context.fatalError('Multiple @:timeout meta', p[0].pos);
-		}
+		var tname = (switch cls.meta.extract(':name') {
+			case []: Success(cls.name);
+			case [{params: [p]}]: p.getString();
+			case v: v[0].pos.makeFailure('Expected only one @:name metadata with exactly one parameter');
+		}).sure();
+		var clstimeout = getTimeout(cls.meta).sure();
 		var ct = type.toComplex();
 		var tests = [
 			Startup => [],
@@ -51,35 +44,39 @@ class Macro {
 			var fname = field.name;
 			
 			var kind:Kind = null;
-			function checkKind(meta:String, k:Kind) switch field.meta.extract(meta) {
-				case []: // skip
-				case v: 
-					if(kind == null) kind = k
-					else Context.fatalError('Cannot declare @$meta and @:${Std.string(kind).toLowerCase()} on the same function', v[0].pos); 
+			function checkKind(meta:String, k:Kind) return switch field.meta.extract(meta) {
+				case []: Success(Noise); 
+				case v if(kind == null): kind = k; Success(Noise);
+				case v: v[0].pos.makeFailure('Cannot declare @$meta and @:${Std.string(kind).toLowerCase()} on the same function');
 			}
-			checkKind(':startup', Startup);
-			checkKind(':shutdown', Shutdown);
-			checkKind(':before', Before);
-			checkKind(':after', After);
+			checkKind(':startup', Startup).sure();
+			checkKind(':shutdown', Shutdown).sure();
+			checkKind(':before', Before).sure();
+			checkKind(':after', After).sure();
 			if(kind == null) kind = Test;
 			
 			var description = switch field.meta.extract(':describe') {
 				case []: [macro $v{fname}];
 				case v: [for(v in v) macro $v{v.params[0].getString().sure()}];
 			}
-			var timeout = switch field.meta.extract(':timeout') {
-				case []: clstimeout;
-				case [v]: switch v.params {
-						case [{expr: EConst(CInt(i))}]: Std.parseInt(i);
-						case [{pos: pos}]: Context.fatalError('Expected integer parameter for @:timeout', pos);
-						default: Context.fatalError('Expected exactly one parameter for @:timeout', v.pos);
-					}
-				case p: Context.fatalError('Multiple @:timeout meta', p[0].pos);
-			}
+			var timeout = getTimeout(field.meta, clstimeout).sure();
+			
+			var posInfos = Context.getPosInfos(field.pos);
 			tests[kind].push(macro @:pos(field.pos) ({
 				descriptions: $a{description},
 				timeout: $v{timeout},
-				result: function() return test.$fname(),
+				run: function() return (function(?pos:haxe.PosInfos) {
+					// this part is hacky, because Context.getPosInfos() doesn't give us the line number
+					// so we need rely on the compiler to generate the line number for us, then override
+					// the values known to us right now
+					pos.className = $v{cls.name};
+					pos.fileName = $v{posInfos.file};
+					pos.methodName = $v{field.name}; 
+					return {
+						pos: pos,
+						result: (test.$fname():tink.unit.TestCase.TestResult),
+					}
+				})(),
 			}:tink.unit.TestCase.Test));
 		}
 		
@@ -119,6 +116,18 @@ class Macro {
 		}
 		return macro null;
 	}
+		
+	static function getTimeout(meta:MetaAccess, def = 5000)
+		return switch meta.extract(':timeout') {
+			case []: Success(def);
+			case [v]: switch v.params {
+					case [{expr: EConst(CInt(i))}]: Success(Std.parseInt(i));
+					case [{pos: pos}]: pos.makeFailure('Expected integer parameter for @:timeout');
+					default: v.pos.makeFailure('Expected exactly one parameter for @:timeout');
+				}
+			case p: p[0].pos.makeFailure('Multiple @:timeout meta');
+		} 
+	
 }
 
 enum Kind {
