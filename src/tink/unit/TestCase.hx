@@ -30,7 +30,7 @@ abstract TestResult(Surprise<Noise, Error>) from Surprise<Noise, Error> to Surpr
 	
 	@:from
 	public static inline function ofFutureAssert(v:Future<Assert>):TestResult
-		return v >> function(assert:Assert) return Success(assert);
+		return (v:Surprise<Noise, Error>);
 	
 	@:from
 	public static inline function ofUnsafeAssert(v:Surprise<Assert, Error>):TestResult

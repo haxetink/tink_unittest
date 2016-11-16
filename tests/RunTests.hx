@@ -45,7 +45,6 @@ class NormalTest {
 		return true ? Success(Noise) : Failure(new Error('Errored!'));
 	}
 
-
 	@:describe('Sync test using Assert')
 	public function syncAssert() {
 		debug('syncAssert');

@@ -16,6 +16,11 @@ abstract Assert(Outcome<Noise, Error>) from Outcome<Noise, Error> to Outcome<Noi
 	public static function isFalse(actual:Bool, ?errmsg:String, ?pos:PosInfos):Assert
 		return equals(false, actual, errmsg, pos);
 		
+	#if deep_equal
+	public static function deepEquals(expected:Dynamic, actual:Dynamic, ?pos:PosInfos):Assert
+		return deepequal.DeepEqual.compare(expected, actual, pos);
+	#end
+		
 	@:op(A&&B)
 	public function and(b:Assert)
 		return switch this {
