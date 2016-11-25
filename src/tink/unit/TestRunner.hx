@@ -58,9 +58,7 @@ class TestRunner {
 	public static function exit(code:Int) {
 		#if travix
 			travix.Logger.exit(code);
-		#elseif js
-			// TODO;
-		#elseif sys
+		#elseif (sys || nodejs)
 			Sys.exit(code);
 		#end
 	}
