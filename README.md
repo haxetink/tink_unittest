@@ -12,6 +12,8 @@ Supported metadata:
 - `@:shutdown`: Run once after all tests
 - `@:timeout(int)`: Set timeout (in ms), default: 5000 (you can also put this at class-level)
 - `@:describe(string)`: Set description of test, default: name of function
+- `@:include`: Only run tests tagged with `@:include`
+- `@:exclude`: Exclude this test
 
 ```haxe
 import tink.unit.TestRunner.*;

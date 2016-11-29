@@ -4,16 +4,45 @@ using tink.CoreApi;
 
 class RunTests {
 	static function main() {
+		
+		var code = 0;
+		var futures = [];
+		
 		var normal = new NormalTest();
 		var await = new AwaitTest();
-		run([normal, await]).handle(function(result) {
-			var code = result.errors;
-			// trace(normal.result);
-			// trace(await.result);
-			if(normal.result != 'ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2dd2') code++;
-			if(await.result != 'ss2bb2asyncaa2dd2') code++;
-			exit(code);
-		});
+		var exclude = new ExcludeTest();
+		futures.push(function() return run([normal, await, exclude]) >>
+			function(result) {
+				code += result.errors;
+				if(normal.result != 'ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2dd2') code++;
+				if(await.result != 'ss2bb2asyncaa2dd2') code++;
+				if(exclude.result != 'ss2bb2includeaa2dd2') code++;
+				return Noise;
+			}
+		);
+		
+		var normal = new NormalTest();
+		var await = new AwaitTest();
+		var include = new IncludeTest();
+		futures.push(function() return run([normal, await, include]) >> 
+			function(result) {
+				code += result.errors;
+				if(normal.result != '') code++;
+				if(await.result != '') code++;
+				if(include.result != 'ss2bb2includeaa2dd2') code++;
+				return Noise;
+			}
+		);
+		
+		var iter = futures.iterator();
+		function next() {
+			if(iter.hasNext()) iter.next()().handle(next);
+			else {
+				trace('Exiting with code: $code');
+				exit(code);
+			}
+		}
+		next();
 	}
 }
 
@@ -116,4 +145,70 @@ class AwaitTest {
   
   function someAsyncValue() 
     return Future.async(function(cb) haxe.Timer.delay(function() cb('actual'), 1000));
+}
+
+class IncludeTest {
+	public var result:String;
+	
+	public function new() {
+		result = '';
+	}
+	
+	function debug(msg:String) {
+		result += msg;
+		return Noise;
+	}
+	
+	@:before public function before() return debug('b');
+	@:before public function before2() return debug('b2');
+	@:after public function after() return debug('a');
+	@:after public function after2() return debug('a2');
+	@:startup public function startup() return debug('s');
+	@:startup public function startup2() return debug('s2');
+	@:shutdown public function shutdown() return debug('d');
+	@:shutdown public function shutdown2() return debug('d2');
+		
+	@:include
+	public function include() {
+		debug('include');
+		return isTrue(true);
+	}
+
+	public function skip() {
+		debug('skip');
+		return isTrue(true);
+	}
+}
+
+class ExcludeTest {
+	public var result:String;
+	
+	public function new() {
+		result = '';
+	}
+	
+	function debug(msg:String) {
+		result += msg;
+		return Noise;
+	}
+	
+	@:before public function before() return debug('b');
+	@:before public function before2() return debug('b2');
+	@:after public function after() return debug('a');
+	@:after public function after2() return debug('a2');
+	@:startup public function startup() return debug('s');
+	@:startup public function startup2() return debug('s2');
+	@:shutdown public function shutdown() return debug('d');
+	@:shutdown public function shutdown2() return debug('d2');
+		
+	@:exclude
+	public function exclude() {
+		debug('exclude');
+		return isTrue(true);
+	}
+
+	public function include() {
+		debug('include');
+		return isTrue(true);
+	}
 }

@@ -4,28 +4,48 @@ import haxe.macro.Expr;
 using tink.CoreApi;
 
 class TestRunner {
+	public static var includeMode(default, null):Bool;
 	
 	public static macro function run(e:ExprOf<Array<Dynamic>>):ExprOf<Future<Result>>
 		return Macro.run(e);
 		
 	public static function runAll(runners:Array<RunnerBase>):Future<Result> {
 		log('');
+		includeMode = false;
+		for(r in runners) if(r.includeMode) {
+			includeMode = true;
+			break;
+		}
 		return Future.async(function(cb) {
 			var iter = runners.iterator();
 			var result = [];
 			function next() {
 				if(iter.hasNext()) {
 					var current = iter.next(); 
-					var name = current.name; 
-					log(name);
-					current.run().handle(function(o) {
-						result.push({
-							name: name,
-							total: o.total,
-							errors: o.errors,
-						});
+		
+					var skip = false;
+					if(includeMode) {
+						skip = true;
+						for(test in @:privateAccess current.tests) if(test.include) {
+							skip = false;
+							break;
+						}
+					}
+					
+					if(skip) 
 						next();
-					});
+					else {
+						var name = current.name;
+						log(name);
+						current.run().handle(function(o) {
+							result.push({
+								name: name,
+								total: o.total,
+								errors: o.errors,
+							});
+							next();
+						});
+					}
 				} else {
 					var total = 0;
 					var errors = 0;
@@ -69,6 +89,7 @@ class Runner<T> {}
 
 class RunnerBase {
 	public var name(default, null):String;
+	public var includeMode(default, null):Bool;
 	
 	var startups:Array<Test>;
 	var shutdowns:Array<Test>;
@@ -84,6 +105,7 @@ class RunnerBase {
 		errors = [];
 		total = 0;
 		testing = false;
+		
 		return _run(startups) >>
 			function(_) {
 				testing = true; 
@@ -114,40 +136,42 @@ class RunnerBase {
 							});
 						});
 					}
-					
-					sub(befores).handle(function(o) {
-						// run test
-						var current = iter.next();
-						if(testing) {
-							total++;
-							for(desc in current.descriptions)
-								log('  $desc');
-						}
-						var timer = null;
-						var done = false;
-						var run = current.run();
-						var link = run.result.handle(function(o) {
-							switch o {
-								case Success(_): // ok
-								case Failure(f):
-									if(testing)
-										errors.push(f);
-									log('    ' + f.toString());
+					var current = iter.next();
+					if(testing && ((TestRunner.includeMode && !current.include) || current.exclude))
+						next();
+					else
+						sub(befores).handle(function(o) {
+							// run test
+							if(testing) {
+								total++;
+								for(desc in current.descriptions)
+									log('  $desc');
 							}
-							done = true;
-							if(timer != null) timer.stop();
-							sub(afters).handle(next);
-						});
-						
-						if(!done)
-							timer = haxe.Timer.delay(function() {
-								link.dissolve();
-								var error = new Error('Timeout after ${current.timeout}ms' #if !macro, run.pos #end);
-								log('    ' + error.toString());
-								if(testing) errors.push(error);
+							var timer = null;
+							var done = false;
+							var run = current.run();
+							var link = run.result.handle(function(o) {
+								switch o {
+									case Success(_): // ok
+									case Failure(f):
+										if(testing)
+											errors.push(f);
+										log('    ' + f.toString());
+								}
+								done = true;
+								if(timer != null) timer.stop();
 								sub(afters).handle(next);
-							}, current.timeout);
-					});
+							});
+							
+							if(!done)
+								timer = haxe.Timer.delay(function() {
+									link.dissolve();
+									var error = new Error('Timeout after ${current.timeout}ms' #if !macro, run.pos #end);
+									log('    ' + error.toString());
+									if(testing) errors.push(error);
+									sub(afters).handle(next);
+								}, current.timeout);
+						});
 					
 				} else {
 					cb(Noise);
@@ -175,6 +199,8 @@ typedef Test = {
 	descriptions:Array<String>,
 	timeout:Int,
 	run:Void->{pos:haxe.PosInfos, result:TestResult},
+	include:Bool,
+	exclude:Bool,
 }
 
 @:forward

@@ -40,6 +40,8 @@ class Macro {
 			After => [],
 			Test => [],
 		];
+		
+		var includeMode = false;
 		for(field in cls.fields.get()) if(field.isPublic && field.kind.match(FMethod(_))) {
 			var fname = field.name;
 			
@@ -61,10 +63,16 @@ class Macro {
 			}
 			var timeout = getTimeout(field.meta, clstimeout).sure();
 			
+			var exclude = field.meta.extract(':exclude').length > 0;
+			var include = field.meta.extract(':include').length > 0;
+			if(include) includeMode = true;
+			
 			var posInfos = Context.getPosInfos(field.pos);
 			tests[kind].push(macro @:pos(field.pos) ({
 				descriptions: $a{description},
 				timeout: $v{timeout},
+				include: $v{include},
+				exclude: $v{exclude},
 				run: function() return (function(?pos:haxe.PosInfos) {
 					// this part is hacky, because Context.getPosInfos() doesn't give us the line number
 					// so we need rely on the compiler to generate the line number for us, then override
@@ -90,6 +98,7 @@ class Macro {
 				befores = $a{tests[Before]};
 				afters = $a{tests[After]};
 				tests = $a{tests[Test]};
+				includeMode = $v{includeMode};
 			}
 		}
 		def.pack = ['tink', 'unit'];
