@@ -9,26 +9,26 @@ class RunTests {
 		var futures = [];
 		
 		var normal = new NormalTest();
-		var await = new AwaitTest();
+		var _await = new AwaitTest();
 		var exclude = new ExcludeTest();
-		futures.push(function() return run([normal, await, exclude]) >>
+		futures.push(function() return run([normal, _await, exclude]) >>
 			function(result) {
 				code += result.errors;
 				if(normal.result != 'ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2dd2') code++;
-				if(await.result != 'ss2bb2asyncaa2dd2') code++;
+				if(_await.result != 'ss2bb2asyncaa2dd2') code++;
 				if(exclude.result != 'ss2bb2includeaa2dd2') code++;
 				return Noise;
 			}
 		);
 		
 		var normal = new NormalTest();
-		var await = new AwaitTest();
+		var _await = new AwaitTest();
 		var include = new IncludeTest();
-		futures.push(function() return run([normal, await, include]) >> 
+		futures.push(function() return run([normal, _await, include]) >> 
 			function(result) {
 				code += result.errors;
 				if(normal.result != '') code++;
-				if(await.result != '') code++;
+				if(_await.result != '') code++;
 				if(include.result != 'ss2bb2includeaa2dd2') code++;
 				return Noise;
 			}
