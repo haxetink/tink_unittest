@@ -10,6 +10,12 @@ abstract Assert(Outcome<Noise, Error>) from Outcome<Noise, Error> to Outcome<Noi
 	public static function notEquals<T>(expected:T, actual:T, ?errmsg:String, ?pos:PosInfos):Assert
 		return isFalse(expected == actual, errmsg == null ? 'Expected actual vlaue to be different from $expected, but they are the same' : errmsg, pos);
 		
+	public static function isNull<T>(actual:T, ?errmsg:String, ?pos:PosInfos):Assert
+		return equals(null, actual, errmsg, pos);
+		
+	public static function notNull<T>(actual:T, ?errmsg:String, ?pos:PosInfos):Assert
+		return notEquals(null, actual, errmsg, pos);
+		
 	public static function isTrue(actual:Bool, ?errmsg:String, ?pos:PosInfos):Assert
 		return equals(true, actual, errmsg, pos);
 		
