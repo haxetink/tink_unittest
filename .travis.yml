@@ -17,7 +17,7 @@ haxe:
 #     - haxe: development
     
 install:
-  - haxelib install travix
+  - haxelib git https://github.com/kevinresol/travix fix_php_nest_level
   - haxelib run travix install
 
 script:
