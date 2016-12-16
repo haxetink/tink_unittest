@@ -9,8 +9,12 @@ class TestRunner {
 	public static macro function run(e:ExprOf<Array<Dynamic>>):ExprOf<Future<Result>>
 		return Macro.run(e);
 		
-	public static function runAll(runners:Array<RunnerBase>):Future<Result> {
-		log('');
+	public static function runAll(runners:Array<RunnerBase>, ?reporter:Reporter):Future<Result> {
+		
+		if(reporter == null) reporter = new tink.unit.Reporter.SimpleReporter();
+		
+		reporter.log('');
+		
 		includeMode = false;
 		for(r in runners) if(r.includeMode) {
 			includeMode = true;
@@ -36,8 +40,8 @@ class TestRunner {
 						next();
 					else {
 						var name = current.name;
-						log(name);
-						current.run().handle(function(o) {
+						reporter.log(name);
+						current.run(reporter).handle(function(o) {
 							result.push({
 								name: name,
 								total: o.total,
@@ -53,7 +57,7 @@ class TestRunner {
 						total += r.total;
 						errors += r.errors.length;
 					}
-					log('\n$total Tests   ${total - errors} Success   $errors Errors\n');
+					reporter.log('\n$total Tests   ${total - errors} Success   $errors Errors\n');
 					cb({
 						total: total,
 						errors: errors,
@@ -101,11 +105,13 @@ class RunnerBase {
 	var errors:Array<Error>;
 	var total:Int;
 	
-	public function run() {
+	var reporter:Reporter;
+	
+	public function run(reporter:Reporter) {
+		this.reporter = reporter;
 		errors = [];
 		total = 0;
 		testing = false;
-		
 		return _run(startups) >>
 			function(_) {
 				testing = true; 
@@ -145,7 +151,7 @@ class RunnerBase {
 							if(testing) {
 								total++;
 								for(desc in current.descriptions)
-									log('  $desc');
+									reporter.log('  $desc');
 							}
 							var timer = null;
 							var done = false;
@@ -156,7 +162,7 @@ class RunnerBase {
 									case Failure(f):
 										if(testing)
 											errors.push(f);
-										log('    ' + f.toString());
+										reporter.log('    ' + f.toString());
 								}
 								done = true;
 								if(timer != null) timer.stop();
@@ -167,7 +173,7 @@ class RunnerBase {
 								timer = haxe.Timer.delay(function() {
 									link.dissolve();
 									var error = new Error('Timeout after ${current.timeout}ms' #if !macro, run.pos #end);
-									log('    ' + error.toString());
+									reporter.log('    ' + error.toString());
 									if(testing) errors.push(error);
 									sub(afters).handle(next);
 								}, current.timeout);
@@ -182,7 +188,6 @@ class RunnerBase {
 	}
 	
 	public inline function asRunner():RunnerBase return this;
-	inline function log(msg) TestRunner.log(msg);
 }
 
 
