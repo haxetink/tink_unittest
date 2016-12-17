@@ -6,14 +6,14 @@ using tink.CoreApi;
 class TestRunner {
 	public static var includeMode(default, null):Bool;
 	
-	public static macro function run(e:ExprOf<Array<Dynamic>>):ExprOf<Future<Result>>
+	public static macro function run(e:ExprOf<Array<Dynamic>>):ExprOf<Future<AllResult>>
 		return Macro.run(e);
 		
-	public static function runAll(runners:Array<RunnerBase>, ?reporter:Reporter):Future<Result> {
+	public static function runAll(runners:Array<RunnerBase>, ?reporter:Reporter):Future<AllResult> {
 		
 		if(reporter == null) reporter = new tink.unit.Reporter.SimpleReporter();
 		
-		reporter.log('');
+		reporter.log(All(Begin));
 		
 		includeMode = false;
 		for(r in runners) if(r.includeMode) {
@@ -40,8 +40,9 @@ class TestRunner {
 						next();
 					else {
 						var name = current.name;
-						reporter.log(name);
+						reporter.log(Collection(current, Begin));
 						current.run(reporter).handle(function(o) {
+							reporter.log(Collection(current, End(o)));
 							result.push({
 								name: name,
 								total: o.total,
@@ -57,12 +58,14 @@ class TestRunner {
 						total += r.total;
 						errors += r.errors.length;
 					}
-					reporter.log('\n$total Tests   ${total - errors} Success   $errors Errors\n');
-					cb({
+					
+					var o = {
 						total: total,
 						errors: errors,
 						details: result,
-					});
+					}
+					reporter.log(All(End(o)));
+					cb(o);
 				}
 			}
 			next();
@@ -150,8 +153,7 @@ class RunnerBase {
 							// run test
 							if(testing) {
 								total++;
-								for(desc in current.descriptions)
-									reporter.log('  $desc');
+								reporter.log(Individual(current, Begin));
 							}
 							var timer = null;
 							var done = false;
@@ -162,8 +164,8 @@ class RunnerBase {
 									case Failure(f):
 										if(testing)
 											errors.push(f);
-										reporter.log('    ' + f.toString());
 								}
+								reporter.log(Individual(current, End(o)));
 								done = true;
 								if(timer != null) timer.stop();
 								sub(afters).handle(next);
@@ -173,7 +175,7 @@ class RunnerBase {
 								timer = haxe.Timer.delay(function() {
 									link.dissolve();
 									var error = new Error('Timeout after ${current.timeout}ms' #if !macro, run.pos #end);
-									reporter.log('    ' + error.toString());
+									reporter.log(Individual(current, End(Failure(error))));
 									if(testing) errors.push(error);
 									sub(afters).handle(next);
 								}, current.timeout);
@@ -191,13 +193,15 @@ class RunnerBase {
 }
 
 
-typedef Result = {
+typedef AllResult = {
 	total:Int,
 	errors:Int,
-	details:Array<{
-		total:Int,
-		errors:Array<Error>
-	}>,
+	details:Array<CollectionResult>,
+}
+
+typedef CollectionResult = {
+	total:Int,
+	errors:Array<Error>,
 }
 
 typedef Test = {
