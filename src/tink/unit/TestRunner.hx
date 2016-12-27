@@ -234,5 +234,13 @@ abstract TestResult(Surprise<Noise, Error>) from Surprise<Noise, Error> to Surpr
 	@:from
 	public static inline function ofUnsafeAssert(v:Surprise<Assert, Error>):TestResult
 		return v >> function(assert:Assert) return assert;
+		
+	@:from
+	public static inline function ofPromise(v:Promise<Noise>):TestResult
+		return (v:Surprise<Noise, Error>);
+		
+	@:from
+	public static inline function ofPromiseAssert(v:Promise<Assert>):TestResult
+		return ofUnsafeAssert(v);
 	#end
 }
