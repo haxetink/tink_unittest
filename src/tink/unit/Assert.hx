@@ -8,7 +8,7 @@ abstract Assert(Outcome<Noise, Error>) from Outcome<Noise, Error> to Outcome<Noi
 		return expected == actual ? Success(Noise) : Failure(new Error(errmsg == null ? 'Expected $expected, but got $actual' : errmsg, pos));
 		
 	public static function notEquals<T>(expected:T, actual:T, ?errmsg:String, ?pos:PosInfos):Assert
-		return isFalse(expected == actual, errmsg == null ? 'Expected actual vlaue to be different from $expected, but they are the same' : errmsg, pos);
+		return isFalse(expected == actual, errmsg == null ? 'Expected actual value to be different from $expected, but they are the same' : errmsg, pos);
 		
 	public static function isNull<T>(actual:T, ?errmsg:String, ?pos:PosInfos):Assert
 		return equals(null, actual, errmsg, pos);
