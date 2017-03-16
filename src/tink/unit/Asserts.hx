@@ -9,14 +9,14 @@ using tink.CoreApi;
 @:forward
 abstract Asserts(Stream<Assertion>) from Stream<Assertion> to Stream<Assertion> {
 	@:from
-	public static inline function ofOutcome(o:Outcome<Noise, Error>):Asserts {
+	public static inline function ofAssertion(o:Assertion):Asserts {
 		var buffer = new AssertBuffer();
 		buffer.add(o);
 		return buffer.complete();
 	}
 	
 	@:from
-	public static inline function ofSurprise(p:Surprise<Noise, Error>):Asserts {
+	public static inline function ofFutureAssertion(p:Future<Assertion>):Asserts {
 		var buffer = new AssertBuffer();
 		p.handle(function(o) {
 			buffer.add(o);
@@ -26,8 +26,23 @@ abstract Asserts(Stream<Assertion>) from Stream<Assertion> to Stream<Assertion> 
 	}
 	
 	@:from
-	public static inline function flatten(p:Promise<Asserts>):Asserts {
-		return Stream.later((p:Promise<Stream<Assertion>>));
+	public static inline function ofSurpriseAssertion(p:Surprise<Assertion, Error>):Asserts {
+		return p >> function(o:Assertion) return ofAssertion(o);
+	}
+	
+	@:from
+	public static inline function ofOutcomeAsserts(o:Outcome<Asserts, Error>):Asserts {
+		return ofSurpriseAsserts(Future.sync(o));
+	}
+	
+	@:from
+	public static inline function ofPromiseAsserts(p:Promise<Asserts>):Asserts {
+		return ofSurpriseAsserts(p);
+	}
+	
+	@:from
+	public static inline function ofSurpriseAsserts(p:Surprise<Asserts, Error>):Asserts {
+		return Stream.later((p:Surprise<Stream<Assertion>, Error>));
 	}
 }
 

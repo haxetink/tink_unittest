@@ -5,59 +5,68 @@ import tink.unit.Assertion;
 import tink.unit.Assertion.*;
 import tink.unit.Suite;
 import tink.unit.Runner;
+import travix.Logger.*;
+
 using tink.CoreApi;
 
 
 class RunTests {
 	static function main() {
 		
+		
+		
+		
+		var code = 0;
+		
+		function oops(?pos:haxe.PosInfos) {
+			trace(pos);
+			code++;
+		}
+		
+		var futures = [];
+		
 		var normal = new NormalTest();
-		Runner.run([
-			tink.unit.Macro.makeSuite(normal),
-		]).handle(function(o) {
-			trace(normal.result == 'ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2dd2');
-			
-		});
+		var _await = new AwaitTest();
+		var exclude = new ExcludeTest();
+		futures.push(
+			function() return Runner.run([
+				tink.unit.Macro.makeSuite(normal), 
+				tink.unit.Macro.makeSuite(_await), 
+				tink.unit.Macro.makeSuite(exclude)
+			]).map(function(result) {
+					code += result.errors().length;
+					if(normal.result != 'ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2dd2') oops();
+					if(_await.result != 'ss2bb2asyncaa2dd2') oops();
+					if(exclude.result != 'ss2bb2includeaa2dd2') oops();
+					return Noise;
+				})
+		);
 		
+		var normal = new NormalTest();
+		var _await = new AwaitTest();
+		var include = new IncludeTest();
+		futures.push(function() return Runner.run([
+			tink.unit.Macro.makeSuite(normal), 
+			tink.unit.Macro.makeSuite(_await), 
+			tink.unit.Macro.makeSuite(include)
+		]).map(function(result) {
+				code += result.errors().length;
+				if(normal.result != '') oops();
+				if(_await.result != '') oops();
+				if(include.result != 'ss2bb2includeaa2dd2') oops();
+				return Noise;
+			})
+		);
 		
-		
-		// var code = 0;
-		// var futures = [];
-		
-		// var _await = new AwaitTest();
-		// var exclude = new ExcludeTest();
-		// futures.push(function() return run([normal, _await, exclude]) >>
-		// 	function(result) {
-		// 		code += result.errors;
-		// 		if(normal.result != 'ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2dd2') code++;
-		// 		if(_await.result != 'ss2bb2asyncaa2dd2') code++;
-		// 		if(exclude.result != 'ss2bb2includeaa2dd2') code++;
-		// 		return Noise;
-		// 	}
-		// );
-		
-		// var normal = new NormalTest();
-		// var _await = new AwaitTest();
-		// var include = new IncludeTest();
-		// futures.push(function() return run([normal, _await, include]) >> 
-		// 	function(result) {
-		// 		code += result.errors;
-		// 		if(normal.result != '') code++;
-		// 		if(_await.result != '') code++;
-		// 		if(include.result != 'ss2bb2includeaa2dd2') code++;
-		// 		return Noise;
-		// 	}
-		// );
-		
-		// var iter = futures.iterator();
-		// function next() {
-		// 	if(iter.hasNext()) iter.next()().handle(next);
-		// 	else {
-		// 		trace('Exiting with code: $code');
-		// 		exit(code);
-		// 	}
-		// }
-		// next();
+		var iter = futures.iterator();
+		function next() {
+			if(iter.hasNext()) iter.next()().handle(next);
+			else {
+				trace('Exiting with code: $code');
+				exit(code);
+			}
+		}
+		next();
 	}
 }
 

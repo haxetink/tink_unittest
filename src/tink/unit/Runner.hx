@@ -7,7 +7,7 @@ import tink.unit.Reporter;
 using tink.CoreApi;
 
 class Runner {
-	public static function run(suites:Array<Suite>, ?reporter:Reporter) {
+	public static function run(suites:Array<Suite>, ?reporter:Reporter):Future<RunnerResult> {
 		
 		if(reporter == null) reporter = new BasicReporter();
 		
@@ -75,6 +75,19 @@ class Runner {
 				});
 			});
 		});
+	}
+}
+
+@:forward
+abstract RunnerResult(Array<SuiteResult>) from Array<SuiteResult> to Array<SuiteResult> {
+	public function errors() {
+		var ret = [];
+		for(s in this) for(c in s.cases) for(a in c.results)
+			switch a {
+				case Success(_): // skip
+				case Failure(_): ret.push(a);
+			}
+		return ret;
 	}
 }
 
