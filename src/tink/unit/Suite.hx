@@ -1,11 +1,9 @@
 package tink.unit;
 
-#if !macro
 import tink.streams.Stream;
 import tink.unit.Case;
 
 using tink.CoreApi;
-#end
 
 @:forward
 abstract Suite(SuiteObject) from SuiteObject to SuiteObject {
@@ -14,7 +12,6 @@ abstract Suite(SuiteObject) from SuiteObject to SuiteObject {
 	// 	return Builder.makeSuite(e);
 	// }
 	
-	#if !macro
 	@:from
 	public static inline function ofCase(caze:Case):Suite
 		return {
@@ -23,7 +20,6 @@ abstract Suite(SuiteObject) from SuiteObject to SuiteObject {
 			},
 			cases: [caze],
 		}
-	#end
 }
 
 typedef SuiteObject = {
@@ -35,7 +31,6 @@ typedef SuiteInfo = {
 	name:String,
 }
 
-#if !macro
 @:genericBuild(tink.unit.Builder.build())
 class TinkSuite<T> {}
 
@@ -68,4 +63,3 @@ abstract Services(Array<Service>) from Array<Service> to Array<Service> {
 }
 
 typedef Service = Void->Promise<Noise>;
-#end

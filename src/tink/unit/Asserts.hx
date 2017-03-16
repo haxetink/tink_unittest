@@ -31,6 +31,7 @@ abstract Asserts(Stream<Assertion>) from Stream<Assertion> to Stream<Assertion> 
 	}
 }
 
+@:forward
 abstract AssertBuffer(Accumulator<Assertion>) to Stream<Assertion> to Asserts {
 	
 	public inline function new()
@@ -59,11 +60,11 @@ abstract AssertBuffer(Accumulator<Assertion>) to Stream<Assertion> to Asserts {
 		add(Assertion.deepEquals(expected, actual, errmsg, pos));
 	#end
 	
-	public function add(assertion:Assertion) {
+	public inline function add(assertion:Assertion) {
 		this.yield(Data(assertion));
 	}
 	
-	public function complete():Stream<Assertion> {
+	public inline function complete():Stream<Assertion> {
 		this.yield(End);
 		return this;
 	}

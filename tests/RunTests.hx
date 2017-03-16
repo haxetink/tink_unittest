@@ -11,16 +11,19 @@ using tink.CoreApi;
 class RunTests {
 	static function main() {
 		
+		var normal = new NormalTest();
 		Runner.run([
-			tink.unit.Macro.makeSuite(new NormalTest()),
+			tink.unit.Macro.makeSuite(normal),
 		]).handle(function(o) {
-			travix.Logger.exit(0);
+			trace(normal.result == 'ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2dd2');
+			
 		});
+		
+		
 		
 		// var code = 0;
 		// var futures = [];
 		
-		// var normal = new NormalTest();
 		// var _await = new AwaitTest();
 		// var exclude = new ExcludeTest();
 		// futures.push(function() return run([normal, _await, exclude]) >>
