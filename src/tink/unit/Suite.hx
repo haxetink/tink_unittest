@@ -8,12 +8,15 @@ using tink.CoreApi;
 abstract Suite(SuiteObject) from SuiteObject to SuiteObject {
 	
 	@:from
-	public static inline function ofCases(cases:Array<Case>):Suite
+	public static inline function ofCases<T:Case>(cases:Array<T>):Suite
 		return {
 			info: {
-				name: [for(c in cases) Type.getClassName(Type.getClass(c))].join(', '),
+				name: [for(c in cases) switch Type.getClass(c) {
+					case null: null;
+					case c: Type.getClassName(c);
+				}].join(', '),
 			},
-			cases: cases,
+			cases: cast cases,
 		}
 	
 	@:from

@@ -1,8 +1,8 @@
 package;
 
+import tink.unit.*;
 import tink.unit.Assertion.*;
-import tink.unit.Runner;
-import tink.unit.impl.TinkBatch;
+import tink.unit.impl.*;
 import tink.unit.impl.TinkSuite.*;
 import travix.Logger.*;
 
@@ -21,6 +21,7 @@ class RunTests {
 		
 		var futures = [];
 		
+		// Test: basic
 		var normal = new NormalTest();
 		var _await = new AwaitTest();
 		var exclude = new ExcludeTest();
@@ -38,6 +39,7 @@ class RunTests {
 			})
 		);
 		
+		// Test: include
 		var normal = new NormalTest();
 		var _await = new AwaitTest();
 		var include = new IncludeTest();
@@ -51,6 +53,23 @@ class RunTests {
 				if(normal.result != '') oops();
 				if(_await.result != '') oops();
 				if(include.result != 'ss2bb2includeaa2dd2') oops();
+				return Noise;
+			})
+		);
+		
+		// Test: cast from single case
+		var single = new SingleCase();
+		futures.push(
+			function() return Runner.run(single).map(function(result) {
+				code += result.errors().length;
+				return Noise;
+			})
+		);
+		
+		// Test: cast from multiple cases
+		futures.push(
+			function() return Runner.run([single, single]).map(function(result) {
+				code += result.errors().length;
 				return Noise;
 			})
 		);
@@ -230,6 +249,12 @@ class ExcludeTest {
 
 	public function include() {
 		debug('include');
+		return isTrue(true);
+	}
+}
+
+class SingleCase extends BasicCase {
+	override function execute():Assertions {
 		return isTrue(true);
 	}
 }

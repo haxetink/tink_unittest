@@ -3,10 +3,10 @@ package tink.unit;
 @:forward
 abstract Batch(BatchObject) from BatchObject to BatchObject {
 	@:from
-	public static inline function ofSuites(suites:Array<Suite>):Batch
+	public static inline function ofSuites<T:Suite>(suites:Array<T>):Batch
 		return {
 			info: {},
-			suites: suites,
+			suites: cast suites,
 		}
 		
 	@:from
@@ -14,7 +14,7 @@ abstract Batch(BatchObject) from BatchObject to BatchObject {
 		return ofSuites([suite]);
 	
 	@:from
-	public static inline function ofCases(cases:Array<Case>):Batch
+	public static inline function ofCases<T:Case>(cases:Array<T>):Batch
 		return ofSuite(cases);
 		
 	@:from
