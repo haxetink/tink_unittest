@@ -7,17 +7,17 @@ import haxe.PosInfos;
 using tink.CoreApi;
 
 @:forward
-abstract Asserts(Stream<Assertion>) from Stream<Assertion> to Stream<Assertion> {
+abstract Assertions(Stream<Assertion>) from Stream<Assertion> to Stream<Assertion> {
 	@:from
-	public static inline function ofAssertion(o:Assertion):Asserts {
-		var buffer = new AssertBuffer();
+	public static inline function ofAssertion(o:Assertion):Assertions {
+		var buffer = new AssertionBuffer();
 		buffer.add(o);
 		return buffer.complete();
 	}
 	
 	@:from
-	public static inline function ofFutureAssertion(p:Future<Assertion>):Asserts {
-		var buffer = new AssertBuffer();
+	public static inline function ofFutureAssertion(p:Future<Assertion>):Assertions {
+		var buffer = new AssertionBuffer();
 		p.handle(function(o) {
 			buffer.add(o);
 			buffer.complete();
@@ -26,28 +26,28 @@ abstract Asserts(Stream<Assertion>) from Stream<Assertion> to Stream<Assertion> 
 	}
 	
 	@:from
-	public static inline function ofSurpriseAssertion(p:Surprise<Assertion, Error>):Asserts {
+	public static inline function ofSurpriseAssertion(p:Surprise<Assertion, Error>):Assertions {
 		return p >> function(o:Assertion) return ofAssertion(o);
 	}
 	
 	@:from
-	public static inline function ofOutcomeAsserts(o:Outcome<Asserts, Error>):Asserts {
-		return ofSurpriseAsserts(Future.sync(o));
+	public static inline function ofOutcomeAssertions(o:Outcome<Assertions, Error>):Assertions {
+		return ofSurpriseAssertions(Future.sync(o));
 	}
 	
 	@:from
-	public static inline function ofPromiseAsserts(p:Promise<Asserts>):Asserts {
-		return ofSurpriseAsserts(p);
+	public static inline function ofPromiseAssertions(p:Promise<Assertions>):Assertions {
+		return ofSurpriseAssertions(p);
 	}
 	
 	@:from
-	public static inline function ofSurpriseAsserts(p:Surprise<Asserts, Error>):Asserts {
+	public static inline function ofSurpriseAssertions(p:Surprise<Assertions, Error>):Assertions {
 		return Stream.later((p:Surprise<Stream<Assertion>, Error>));
 	}
 }
 
 @:forward
-abstract AssertBuffer(Accumulator<Assertion>) to Stream<Assertion> to Asserts {
+abstract AssertionBuffer(Accumulator<Assertion>) to Stream<Assertion> to Assertions {
 	
 	public inline function new()
 		this = new Accumulator();

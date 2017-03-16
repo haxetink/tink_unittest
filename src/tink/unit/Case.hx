@@ -7,7 +7,7 @@ using tink.CoreApi;
 
 interface Case {
 	var info:CaseInfo;
-	function execute():Asserts;
+	function execute():Assertions;
 }
 
 typedef CaseInfo = {
@@ -28,7 +28,7 @@ class TinkCase implements Case {
 		this.test = test;
 	}
 	
-	public function execute():Asserts {
+	public function execute():Assertions {
 		return befores.run()
 			.next(function(_) return test())
 			.next(function(result) return afters.run().next(function(_) return result));

@@ -78,7 +78,7 @@ class Builder {
 									timeout: timeout,
 									exclude: exclude,
 									include: include,
-									runnable: macro function():tink.unit.Asserts return test.$fname(),
+									runnable: macro function():tink.unit.Assertions return test.$fname(),
 								});
 							default:
 								var name = 'run_$fname';
