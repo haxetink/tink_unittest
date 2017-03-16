@@ -7,16 +7,20 @@ import tink.unit.Reporter;
 using tink.CoreApi;
 
 class Runner {
-	public static function run(suites:Array<Suite>, ?reporter:Reporter):Future<RunnerResult> {
-		
-		if(reporter == null) reporter = new BasicReporter();
+	var batch:Batch;
+	var reporter:Reporter;
+	
+	public function new(batch, ?reporter:Reporter) {
+		this.batch = batch;
+		this.reporter = reporter == null ? new BasicReporter() : reporter;
+	}
+	
+	public function run():Future<BatchResult> {
 		
 		return Future.async(function(cb) {
 			reporter.report(RunnerStart).handle(function(_) {
-				
-				var iter = suites.iterator();
-				var results:Array<SuiteResult> = [];
-				
+				var iter = batch.suites.iterator();
+				var results:BatchResult = [];
 				function next() {
 					if(iter.hasNext()) {
 						var suite = iter.next();
@@ -33,7 +37,8 @@ class Runner {
 		});
 	}
 	
-	static function runSuite(suite:Suite, reporter:Reporter):Future<SuiteResult> {
+	
+	function runSuite(suite:Suite, reporter:Reporter):Future<SuiteResult> {
 		return Future.async(function(cb) {
 			reporter.report(SuiteStart(suite.info)).handle(function(_) {
 				var iter = suite.cases.iterator();
@@ -58,7 +63,7 @@ class Runner {
 		});
 	}
 	
-	static function runCase(caze:Case, reporter:Reporter):Future<CaseResult> {
+	function runCase(caze:Case, reporter:Reporter):Future<CaseResult> {
 		return Future.async(function(cb) {
 			reporter.report(CaseStart(caze.info)).handle(function(_) {
 				
@@ -79,7 +84,7 @@ class Runner {
 }
 
 @:forward
-abstract RunnerResult(Array<SuiteResult>) from Array<SuiteResult> to Array<SuiteResult> {
+abstract BatchResult(Array<SuiteResult>) from Array<SuiteResult> to Array<SuiteResult> {
 	public function errors() {
 		var ret = [];
 		for(s in this) for(c in s.cases) for(a in c.results)

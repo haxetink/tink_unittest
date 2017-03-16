@@ -6,6 +6,7 @@ import tink.unit.Runner;
 
 using tink.CoreApi;
 using Lambda;
+using StringTools;
 
 interface Reporter {
 	function report(type:ReportType):Future<Noise>;
@@ -31,10 +32,11 @@ class BasicReporter implements Reporter {
 			case RunnerStart:
 				
 			case SuiteStart(info):
+				Sys.println('');
 				Sys.println(info.name);
 				
 			case CaseStart(info):
-				Sys.println(info.description);
+				Sys.println(indent(info.description, 2));
 				
 			case CaseFinish({results: results}):
 				
@@ -50,9 +52,17 @@ class BasicReporter implements Reporter {
 					}
 				}
 				var success = total - errors;
+				Sys.println('');
 				Sys.println('$total Assertions   $success Success   $errors Errors');
+				Sys.println('');
 				
 		}
 		return noise;
+	}
+	
+	function indent(v:String, i:Int) {
+		return v.split('\n')
+			.map(function(line) return ''.lpad(' ', i) + line)
+			.join('\n');
 	}
 }

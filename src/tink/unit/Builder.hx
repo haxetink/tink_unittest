@@ -100,18 +100,20 @@ class Builder {
 					cases = cases.filter(function(c) return !c.exclude && (!includeMode || c.include));
 					var tinkCases = [];
 					for(i in 0...cases.length) {
+						var caze = cases[i];
 						var befores = i == 0 ? macro startups.concat(befores) : macro befores;
 						var afters = i == cases.length - 1 ? macro afters.concat(shutdowns) : macro afters;
 						var info = macro {
-							description: $v{cases[i].description}
+							description: $v{caze.description}
 						}
-						tinkCases.push(macro new tink.unit.Case.TinkCase($info, $befores, $afters, ${cases[i].runnable}));
+						tinkCases.push(macro new tink.unit.Case.TinkCase($info, $befores, $afters, ${caze.runnable}, includeMode, $v{caze.include}));
 					}
 					
 					var def = macro class $clsname extends tink.unit.Suite.TinkSuiteBase<$ct> {
 						
 						public function new(test) {
 							this.test = test;
+							this.includeMode = $v{includeMode};
 							info = {
 								name: $v{suiteName},
 							}

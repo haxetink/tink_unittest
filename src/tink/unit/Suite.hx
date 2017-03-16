@@ -32,11 +32,17 @@ typedef SuiteInfo = {
 }
 
 @:genericBuild(tink.unit.Builder.build())
-class TinkSuite<T> {}
+class TinkSuiteBuilder<T> {}
+
+typedef TinkSuite = {
+	> SuiteObject,
+	var includeMode:Ref<Bool>;
+}
 
 class TinkSuiteBase<T> {
 	public var info:SuiteInfo;
 	public var cases:Array<Case>;
+	public var includeMode:Ref<Bool>;
 	
 	var test:T;
 	var startups:Services;

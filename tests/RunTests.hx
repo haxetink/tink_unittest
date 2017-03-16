@@ -29,11 +29,11 @@ class RunTests {
 		var _await = new AwaitTest();
 		var exclude = new ExcludeTest();
 		futures.push(
-			function() return Runner.run([
+			function() return new Runner(new tink.unit.Batch.TinkBatch([
 				tink.unit.Macro.makeSuite(normal), 
 				tink.unit.Macro.makeSuite(_await), 
 				tink.unit.Macro.makeSuite(exclude)
-			]).map(function(result) {
+			])).run().map(function(result) {
 					code += result.errors().length;
 					if(normal.result != 'ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2dd2') oops();
 					if(_await.result != 'ss2bb2asyncaa2dd2') oops();
@@ -45,11 +45,11 @@ class RunTests {
 		var normal = new NormalTest();
 		var _await = new AwaitTest();
 		var include = new IncludeTest();
-		futures.push(function() return Runner.run([
+		futures.push(function() return new Runner(new tink.unit.Batch.TinkBatch([
 			tink.unit.Macro.makeSuite(normal), 
 			tink.unit.Macro.makeSuite(_await), 
 			tink.unit.Macro.makeSuite(include)
-		]).map(function(result) {
+		])).run().map(function(result) {
 				code += result.errors().length;
 				if(normal.result != '') oops();
 				if(_await.result != '') oops();
