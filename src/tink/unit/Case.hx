@@ -1,28 +1,38 @@
 package tink.unit;
 
 import tink.streams.Stream;
+import tink.unit.Suite;
 
 using tink.CoreApi;
 
 interface Case {
 	var info:CaseInfo;
-	function execute():Stream<Assertion>;
+	function execute():Asserts;
 }
 
 typedef CaseInfo = {
 	description:String,
 }
 
-class BasicCase implements Case {
-	
+class TinkCase implements Case {
 	public var info:CaseInfo;
-	var assert:AssertBuffer;
 	
-	public function new() {
-		assert = new AssertBuffer();
+	var befores:Services;
+	var afters:Services;
+	var test:Void->Stream<Assertion>;
+	
+	public function new(info, befores, afters, test) {
+		this.info = info;
+		this.befores = befores;
+		this.afters = afters;
+		this.test = test;
 	}
 	
-	public function execute():Stream<Assertion> {
-		return assert;
+	public function execute():Asserts {
+		return befores.run()
+			.next(function(_) return test())
+			.next(function(result) return afters.run().next(function(_) return result));
 	}
+	
+	
 }

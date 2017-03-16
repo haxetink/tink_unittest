@@ -3,7 +3,9 @@ package tink.unit;
 import tink.unit.Suite;
 import tink.unit.Case;
 import tink.unit.Runner;
+
 using tink.CoreApi;
+using Lambda;
 
 interface Reporter {
 	function report(type:ReportType):Future<Noise>;
@@ -25,7 +27,32 @@ class BasicReporter implements Reporter {
 	public function new() {}
 	
 	public function report(type:ReportType):Future<Noise> {
-		Sys.println(Std.string(type));
+		switch type {
+			case RunnerStart:
+				
+			case SuiteStart(info):
+				Sys.println(info.name);
+				
+			case CaseStart(info):
+				Sys.println(info.description);
+				
+			case CaseFinish({results: results}):
+				
+			case SuiteFinish(result):
+				
+			case RunnerFinish(result):
+				var total = 0;
+				var errors = 0;
+				for(s in result) {
+					for(c in s.cases) {
+						total += c.results.length;
+						errors += c.results.count(function(r) return !r.isSuccess());
+					}
+				}
+				var success = total - errors;
+				Sys.println('$total Assertions   $success Success   $errors Errors');
+				
+		}
 		return noise;
 	}
 }

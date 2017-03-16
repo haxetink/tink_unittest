@@ -6,7 +6,32 @@ import haxe.PosInfos;
 
 using tink.CoreApi;
 
-abstract AssertBuffer(Accumulator<Assertion>) to Stream<Assertion> {
+@:forward
+abstract Asserts(Stream<Assertion>) from Stream<Assertion> to Stream<Assertion> {
+	@:from
+	public static inline function ofOutcome(o:Outcome<Noise, Error>):Asserts {
+		var buffer = new AssertBuffer();
+		buffer.add(o);
+		return buffer.complete();
+	}
+	
+	@:from
+	public static inline function ofSurprise(p:Surprise<Noise, Error>):Asserts {
+		var buffer = new AssertBuffer();
+		p.handle(function(o) {
+			buffer.add(o);
+			buffer.complete();
+		});
+		return buffer;
+	}
+	
+	@:from
+	public static inline function flatten(p:Promise<Asserts>):Asserts {
+		return Stream.later((p:Promise<Stream<Assertion>>));
+	}
+}
+
+abstract AssertBuffer(Accumulator<Assertion>) to Stream<Assertion> to Asserts {
 	
 	public inline function new()
 		this = new Accumulator();
@@ -42,5 +67,4 @@ abstract AssertBuffer(Accumulator<Assertion>) to Stream<Assertion> {
 		this.yield(End);
 		return this;
 	}
-	
 }

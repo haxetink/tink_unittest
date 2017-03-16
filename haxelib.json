@@ -10,6 +10,7 @@
   "version": "0.0.0",
   "url": "https://github.com/kevinresol/tink_unittest/",
   "dependencies": {
-    "tink_streams": ""
+    "tink_streams": "",
+    "tink_macro": ""
   }
 }
