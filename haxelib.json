@@ -1,0 +1,15 @@
+{
+  "name": "tink_unittest",
+  "license": "MIT",
+  "tags": [],
+  "classPath": "src",
+  "contributors": [
+    "kevinresol"
+  ],
+  "releasenote": "initial release",
+  "version": "0.0.0",
+  "url": "https://github.com/kevinresol/tink_unittest/",
+  "dependencies": {
+    "tink_streams": ""
+  }
+}
