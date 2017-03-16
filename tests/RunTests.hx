@@ -1,10 +1,9 @@
 package;
 
-import tink.streams.Stream;
-import tink.unit.Assertion;
 import tink.unit.Assertion.*;
-import tink.unit.Suite;
 import tink.unit.Runner;
+import tink.unit.impl.TinkBatch;
+import tink.unit.impl.TinkSuite.*;
 import travix.Logger.*;
 
 using tink.CoreApi;
@@ -12,9 +11,6 @@ using tink.CoreApi;
 
 class RunTests {
 	static function main() {
-		
-		
-		
 		
 		var code = 0;
 		
@@ -29,27 +25,28 @@ class RunTests {
 		var _await = new AwaitTest();
 		var exclude = new ExcludeTest();
 		futures.push(
-			function() return new Runner(new tink.unit.Batch.TinkBatch([
-				tink.unit.Macro.makeSuite(normal), 
-				tink.unit.Macro.makeSuite(_await), 
-				tink.unit.Macro.makeSuite(exclude)
-			])).run().map(function(result) {
-					code += result.errors().length;
-					if(normal.result != 'ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2dd2') oops();
-					if(_await.result != 'ss2bb2asyncaa2dd2') oops();
-					if(exclude.result != 'ss2bb2includeaa2dd2') oops();
-					return Noise;
-				})
+			function() return Runner.run(new TinkBatch([
+				make(normal), 
+				make(_await), 
+				make(exclude),
+			])).map(function(result) {
+				code += result.errors().length;
+				if(normal.result != 'ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2dd2') oops();
+				if(_await.result != 'ss2bb2asyncaa2dd2') oops();
+				if(exclude.result != 'ss2bb2includeaa2dd2') oops();
+				return Noise;
+			})
 		);
 		
 		var normal = new NormalTest();
 		var _await = new AwaitTest();
 		var include = new IncludeTest();
-		futures.push(function() return new Runner(new tink.unit.Batch.TinkBatch([
-			tink.unit.Macro.makeSuite(normal), 
-			tink.unit.Macro.makeSuite(_await), 
-			tink.unit.Macro.makeSuite(include)
-		])).run().map(function(result) {
+		futures.push(
+			function() return Runner.run(new TinkBatch([
+				make(normal), 
+				make(_await), 
+				make(include),
+			])).map(function(result) {
 				code += result.errors().length;
 				if(normal.result != '') oops();
 				if(_await.result != '') oops();

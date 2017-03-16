@@ -1,6 +1,5 @@
 package tink.unit;
 
-import tink.streams.Stream;
 import tink.unit.Case;
 
 using tink.CoreApi;
@@ -31,26 +30,6 @@ typedef SuiteInfo = {
 	name:String,
 }
 
-@:genericBuild(tink.unit.Builder.build())
-class TinkSuiteBuilder<T> {}
-
-typedef TinkSuite = {
-	> SuiteObject,
-	var includeMode:Ref<Bool>;
-}
-
-class TinkSuiteBase<T> {
-	public var info:SuiteInfo;
-	public var cases:Array<Case>;
-	public var includeMode:Ref<Bool>;
-	
-	var test:T;
-	var startups:Services;
-	var befores:Services;
-	var afters:Services;
-	var shutdowns:Services;
-	
-}
 
 @:forward
 abstract Services(Array<Service>) from Array<Service> to Array<Service> {

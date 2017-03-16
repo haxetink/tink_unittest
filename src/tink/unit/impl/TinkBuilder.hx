@@ -1,4 +1,4 @@
-package tink.unit;
+package tink.unit.impl;
 
 import haxe.macro.Context;
 import haxe.macro.Type;
@@ -9,7 +9,7 @@ using Lambda;
 using tink.MacroApi;
 #end
 
-class Builder {
+class TinkBuilder {
 	
 	static var cache = new TypeMap();
 	static var counter = 0;
@@ -106,10 +106,10 @@ class Builder {
 						var info = macro {
 							description: $v{caze.description}
 						}
-						tinkCases.push(macro new tink.unit.Case.TinkCase($info, $befores, $afters, ${caze.runnable}, includeMode, $v{caze.include}));
+						tinkCases.push(macro new tink.unit.impl.TinkCase($info, $befores, $afters, ${caze.runnable}, includeMode, $v{caze.include}));
 					}
 					
-					var def = macro class $clsname extends tink.unit.Suite.TinkSuiteBase<$ct> {
+					var def = macro class $clsname extends tink.unit.impl.TinkSuite.TinkSuiteBase<$ct> {
 						
 						public function new(test) {
 							this.test = test;

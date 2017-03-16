@@ -7,15 +7,10 @@ import tink.unit.Reporter;
 using tink.CoreApi;
 
 class Runner {
-	var batch:Batch;
-	var reporter:Reporter;
 	
-	public function new(batch, ?reporter:Reporter) {
-		this.batch = batch;
-		this.reporter = reporter == null ? new BasicReporter() : reporter;
-	}
-	
-	public function run():Future<BatchResult> {
+	public static function run(batch:Batch, ?reporter:Reporter):Future<BatchResult> {
+		
+		if(reporter == null) reporter = new BasicReporter();
 		
 		return Future.async(function(cb) {
 			reporter.report(RunnerStart).handle(function(_) {
@@ -38,7 +33,7 @@ class Runner {
 	}
 	
 	
-	function runSuite(suite:Suite, reporter:Reporter):Future<SuiteResult> {
+	static function runSuite(suite:Suite, reporter:Reporter):Future<SuiteResult> {
 		return Future.async(function(cb) {
 			reporter.report(SuiteStart(suite.info)).handle(function(_) {
 				var iter = suite.cases.iterator();
@@ -63,7 +58,7 @@ class Runner {
 		});
 	}
 	
-	function runCase(caze:Case, reporter:Reporter):Future<CaseResult> {
+	static function runCase(caze:Case, reporter:Reporter):Future<CaseResult> {
 		return Future.async(function(cb) {
 			reporter.report(CaseStart(caze.info)).handle(function(_) {
 				
