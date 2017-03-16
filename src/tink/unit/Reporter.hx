@@ -4,6 +4,16 @@ import tink.unit.Suite;
 import tink.unit.Case;
 import tink.unit.Runner;
 
+#if travix
+import travix.Logger.*;
+#elseif (sys || nodejs)
+import *;
+#else
+	#error "TODO"
+#end
+
+
+
 using tink.CoreApi;
 using Lambda;
 using StringTools;
@@ -32,11 +42,11 @@ class BasicReporter implements Reporter {
 			case RunnerStart:
 				
 			case SuiteStart(info):
-				Sys.println('');
-				Sys.println(info.name);
+				println('');
+				println(info.name);
 				
 			case CaseStart(info):
-				Sys.println(indent(info.description, 2));
+				println(indent(info.description, 2));
 				
 			case CaseFinish({results: results}):
 				
@@ -52,9 +62,9 @@ class BasicReporter implements Reporter {
 					}
 				}
 				var success = total - errors;
-				Sys.println('');
-				Sys.println('$total Assertions   $success Success   $errors Errors');
-				Sys.println('');
+				println('');
+				println('$total Assertions   $success Success   $errors Errors');
+				println('');
 				
 		}
 		return noise;
