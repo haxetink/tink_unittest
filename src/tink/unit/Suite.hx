@@ -7,18 +7,18 @@ using tink.CoreApi;
 @:forward
 abstract Suite(SuiteObject) from SuiteObject to SuiteObject {
 	
-	// public static macro function make(e:haxe.macro.Expr):haxe.macro.Expr.ExprOf<Suite> {
-	// 	return Builder.makeSuite(e);
-	// }
+	@:from
+	public static inline function ofCases(cases:Array<Case>):Suite
+		return {
+			info: {
+				name: [for(c in cases) Type.getClassName(Type.getClass(c))].join(', '),
+			},
+			cases: cases,
+		}
 	
 	@:from
 	public static inline function ofCase(caze:Case):Suite
-		return {
-			info: {
-				name: Type.getClassName(Type.getClass(caze)),
-			},
-			cases: [caze],
-		}
+		return ofCases([caze]);
 }
 
 typedef SuiteObject = {
