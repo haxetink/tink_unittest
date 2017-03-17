@@ -103,7 +103,6 @@ class TestBuilder {
 						var caze = cases[i];
 						var info = macro {
 							description: $v{caze.description},
-							timeout: $v{caze.timeout},
 						}
 						tinkCases.push(macro new tink.unit.TestCase($info, ${caze.runnable}, $v{caze.timeout}, $v{caze.include}, $v{caze.exclude}));
 					}
