@@ -13,7 +13,10 @@ class Runner {
 	public static function run(batch:Batch, ?reporter:Reporter, ?timers:TimerManager):Future<BatchResult> {
 		
 		if(reporter == null) reporter = new BasicReporter();
-		if(timers == null) timers = new HaxeTimerManager();
+		if(timers == null)
+			// TODO: figure this out: #if (haxe_ver >= 3.4 || js || flash)
+			timers = new HaxeTimerManager();
+			// TODO: #elseif tink_runloop
 		
 		return Future.async(function(cb) {
 			reporter.report(RunnerStart).handle(function(_) {
@@ -84,14 +87,15 @@ class Runner {
 					});
 				});
 				
-				var timeout = caze.info != null && caze.info.timeout != null ? caze.info.timeout : 5000;
 				
-				if(!done)
+				if(!done && timers != null) {
+					var timeout = caze.info != null && caze.info.timeout != null ? caze.info.timeout : 5000;
 					timer = timers.schedule(timeout, function() {
 						if(!done) link.dissolve();
 						timer = null;
 						complete([Failure(new Error('Timed out after $timeout ms'))]);
 					});
+				}
 			});
 		});
 	}
