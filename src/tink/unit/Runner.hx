@@ -91,8 +91,7 @@ class Runner {
 				if(!done && timers != null) {
 					var timeout = caze.info != null && caze.info.timeout != null ? caze.info.timeout : 5000;
 					timer = timers.schedule(timeout, function() {
-						if(!done) link.dissolve();
-						timer = null;
+						link.dissolve();
 						complete([Failure(new Error('Timed out after $timeout ms'))]);
 					});
 				}
