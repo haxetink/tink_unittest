@@ -1,18 +1,18 @@
-package tink.unit.impl;
+package tink.unit;
 
-import tink.unit.Assertion;
-import tink.unit.Case;
-import tink.unit.Suite;
-import tink.streams.Stream;
+import tink.testrunner.Assertion;
+import tink.testrunner.Assertions;
+import tink.testrunner.Case;
+import tink.testrunner.Suite;
 
 using tink.CoreApi;
 
-class TinkCase implements Case {
+class TestCase implements Case {
 	public var info:CaseInfo;
 	
 	var befores:Services;
 	var afters:Services;
-	var test:Void->Stream<Assertion>;
+	var test:Void->Assertions;
 	var includeMode:Ref<Bool>;
 	var include:Bool;
 	

@@ -1,16 +1,16 @@
-package tink.unit.impl;
+package tink.unit;
 
 #if !macro
-import tink.unit.Case;
-import tink.unit.Suite;
+import tink.testrunner.Case;
+import tink.testrunner.Suite;
 
 using tink.CoreApi;
 
-@:genericBuild(tink.unit.impl.TinkBuilder.build())
-class TinkSuiteBuilder<T> {}
+@:genericBuild(tink.unit.TestBuilder.build())
+class TestSuiteBuilder<T> {}
 
 
-class TinkSuiteBase<T> extends TinkSuite {
+class TestSuiteBase<T> extends TestSuite {
 	var test:T;
 	var startups:Services;
 	var befores:Services;
@@ -19,7 +19,7 @@ class TinkSuiteBase<T> extends TinkSuite {
 }
 #end
 
-class TinkSuite #if !macro implements SuiteObject #end {
+class TestSuite #if !macro implements SuiteObject #end {
 	#if !macro
 	public var info:SuiteInfo;
 	public var cases:Array<Case>;
@@ -28,6 +28,6 @@ class TinkSuite #if !macro implements SuiteObject #end {
 	
 	public static macro function make(e:haxe.macro.Expr) {
 		var ct = haxe.macro.Context.toComplexType(haxe.macro.Context.typeof(e));
-		return macro new tink.unit.impl.TinkSuite.TinkSuiteBuilder<$ct>($e);
+		return macro new tink.unit.TestSuite.TestSuiteBuilder<$ct>($e);
 	}
 }

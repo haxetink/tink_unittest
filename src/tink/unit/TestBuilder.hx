@@ -1,4 +1,4 @@
-package tink.unit.impl;
+package tink.unit;
 
 import haxe.macro.Context;
 import haxe.macro.Type;
@@ -9,7 +9,7 @@ using Lambda;
 using tink.MacroApi;
 #end
 
-class TinkBuilder {
+class TestBuilder {
 	
 	static var cache = new TypeMap();
 	static var counter = 0;
@@ -78,7 +78,7 @@ class TinkBuilder {
 									timeout: timeout,
 									exclude: exclude,
 									include: include,
-									runnable: macro function():tink.unit.Assertions return test.$fname(),
+									runnable: macro function():tink.testrunner.Assertions return test.$fname(),
 								});
 							default:
 								var name = 'run_$fname';
@@ -107,10 +107,10 @@ class TinkBuilder {
 							description: $v{caze.description},
 							timeout: $v{caze.timeout},
 						}
-						tinkCases.push(macro new tink.unit.impl.TinkCase($info, $befores, $afters, ${caze.runnable}, includeMode, $v{caze.include}));
+						tinkCases.push(macro new tink.unit.TestCase($info, $befores, $afters, ${caze.runnable}, includeMode, $v{caze.include}));
 					}
 					
-					var def = macro class $clsname extends tink.unit.impl.TinkSuite.TinkSuiteBase<$ct> {
+					var def = macro class $clsname extends tink.unit.TestSuite.TestSuiteBase<$ct> {
 						
 						public function new(test) {
 							this.test = test;

@@ -1,9 +1,8 @@
 package;
 
-import tink.unit.*;
+import tink.testrunner.Runner;
 import tink.unit.Assertion.*;
-import tink.unit.Case;
-import tink.unit.impl.TinkBatch;
+import tink.unit.TestBatch;
 import travix.Logger.*;
 
 using tink.CoreApi;
@@ -26,7 +25,7 @@ class RunTests {
 		var _await = new AwaitTest();
 		var exclude = new ExcludeTest();
 		futures.push(
-			function() return Runner.run(TinkBatch.make([
+			function() return Runner.run(TestBatch.make([
 				normal,
 				_await,
 				exclude,
@@ -44,7 +43,7 @@ class RunTests {
 		var _await = new AwaitTest();
 		var include = new IncludeTest();
 		futures.push(
-			function() return Runner.run(TinkBatch.make([
+			function() return Runner.run(TestBatch.make([
 				normal, 
 				_await, 
 				include,
@@ -57,22 +56,6 @@ class RunTests {
 			})
 		);
 		
-		// Test: cast from single case
-		var single = new SingleCase();
-		futures.push(
-			function() return Runner.run(single).map(function(result) {
-				code += result.errors().length;
-				return Noise;
-			})
-		);
-		
-		// Test: cast from multiple cases
-		futures.push(
-			function() return Runner.run([single, single]).map(function(result) {
-				code += result.errors().length;
-				return Noise;
-			})
-		);
 		
 		var iter = futures.iterator();
 		function next() {
@@ -249,12 +232,6 @@ class ExcludeTest {
 
 	public function include() {
 		debug('include');
-		return isTrue(true);
-	}
-}
-
-class SingleCase extends BasicCase {
-	override function execute():Assertions {
 		return isTrue(true);
 	}
 }
