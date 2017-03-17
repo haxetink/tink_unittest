@@ -1,11 +1,7 @@
 package tink.unit;
 
 #if !macro
-import tink.testrunner.Case;
 import tink.testrunner.Suite;
-import tink.testrunner.Services;
-
-using tink.CoreApi;
 
 @:genericBuild(tink.unit.TestBuilder.build())
 class TestSuiteBuilder<T> {}
