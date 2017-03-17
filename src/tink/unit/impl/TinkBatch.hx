@@ -8,7 +8,7 @@ import haxe.macro.Expr;
 using tink.MacroApi;
 #end
 
-class TinkBatch {
+class TinkBatch #if !macro implements BatchObject #end {
 	#if !macro
 	public var info:BatchInfo;
 	public var suites:Array<Suite>;

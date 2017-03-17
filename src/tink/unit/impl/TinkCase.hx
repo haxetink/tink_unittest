@@ -7,7 +7,7 @@ import tink.streams.Stream;
 
 using tink.CoreApi;
 
-class TinkCase {
+class TinkCase implements Case {
 	public var info:CaseInfo;
 	
 	var befores:Services;

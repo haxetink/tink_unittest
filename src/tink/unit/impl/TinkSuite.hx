@@ -19,7 +19,7 @@ class TinkSuiteBase<T> extends TinkSuite {
 }
 #end
 
-class TinkSuite {
+class TinkSuite #if !macro implements SuiteObject #end {
 	#if !macro
 	public var info:SuiteInfo;
 	public var cases:Array<Case>;

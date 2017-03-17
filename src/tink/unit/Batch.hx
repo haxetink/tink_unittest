@@ -4,10 +4,7 @@ package tink.unit;
 abstract Batch(BatchObject) from BatchObject to BatchObject {
 	@:from
 	public static inline function ofSuites<T:Suite>(suites:Array<T>):Batch
-		return {
-			info: {},
-			suites: cast suites,
-		}
+		return new BasicBatch({}, cast suites);
 		
 	@:from
 	public static inline function ofSuite(suite:Suite):Batch
@@ -22,11 +19,21 @@ abstract Batch(BatchObject) from BatchObject to BatchObject {
 		return ofCases([caze]);
 }
 
-typedef BatchObject = {
+interface BatchObject {
 	var info:BatchInfo;
 	var suites:Array<Suite>;
 }
 
 typedef BatchInfo = {
 	
+}
+
+class BasicBatch implements BatchObject {
+	public var info:BatchInfo;
+	public var suites:Array<Suite>;
+	
+	public function new(info, suites) {
+		this.info = info;
+		this.suites = suites;
+	}
 }

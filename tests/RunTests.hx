@@ -2,7 +2,8 @@ package;
 
 import tink.unit.*;
 import tink.unit.Assertion.*;
-import tink.unit.impl.*;
+import tink.unit.Case;
+import tink.unit.impl.TinkBatch;
 import travix.Logger.*;
 
 using tink.CoreApi;
