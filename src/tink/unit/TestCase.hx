@@ -4,32 +4,28 @@ import tink.testrunner.Assertion;
 import tink.testrunner.Assertions;
 import tink.testrunner.Case;
 import tink.testrunner.Suite;
+import tink.testrunner.Services;
 
 using tink.CoreApi;
 
 class TestCase implements Case {
 	public var info:CaseInfo;
+	public var timeout:Int;
+	public var include:Bool;
+	public var exclude:Bool;
 	
-	var befores:Services;
-	var afters:Services;
 	var test:Void->Assertions;
-	var includeMode:Ref<Bool>;
-	var include:Bool;
 	
-	public function new(info, befores, afters, test, includeMode, include) {
+	public function new(info, test, timeout, include, exclude) {
 		this.info = info;
-		this.befores = befores;
-		this.afters = afters;
 		this.test = test;
-		this.includeMode = includeMode;
+		this.timeout = timeout;
 		this.include = include;
+		this.exclude = exclude;
 	}
 	
 	public function execute():Assertions {
-		if(includeMode.value && !include) return [].iterator();
-		return befores.run()
-			.next(function(_) return test())
-			.next(function(result) return afters.run().next(function(_) return result));
+		return test();
 	}
 	
 	

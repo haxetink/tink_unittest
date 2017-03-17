@@ -101,28 +101,24 @@ class TestBuilder {
 					var tinkCases = [];
 					for(i in 0...cases.length) {
 						var caze = cases[i];
-						var befores = i == 0 ? macro startups.concat(befores) : macro befores;
-						var afters = i == cases.length - 1 ? macro afters.concat(shutdowns) : macro afters;
 						var info = macro {
 							description: $v{caze.description},
 							timeout: $v{caze.timeout},
 						}
-						tinkCases.push(macro new tink.unit.TestCase($info, $befores, $afters, ${caze.runnable}, includeMode, $v{caze.include}));
+						tinkCases.push(macro new tink.unit.TestCase($info, ${caze.runnable}, $v{caze.timeout}, $v{caze.include}, $v{caze.exclude}));
 					}
 					
 					var def = macro class $clsname extends tink.unit.TestSuite.TestSuiteBase<$ct> {
-						
-						public function new(test) {
+						public function new(test:$ct) {
+							super(
+								{name: $v{suiteName}},
+								$a{tinkCases},
+								$a{runnables[Startup]},
+								$a{runnables[Shutdown]},
+								$a{runnables[Before]},
+								$a{runnables[After]}
+							);
 							this.test = test;
-							this.includeMode = $v{includeMode};
-							info = {
-								name: $v{suiteName},
-							}
-							startups = $a{runnables[Startup]};
-							shutdowns = $a{runnables[Shutdown]};
-							befores = $a{runnables[Before]};
-							afters = $a{runnables[After]};
-							cases = $a{tinkCases};
 						}
 					}
 					def.fields = def.fields.concat(fields); 
