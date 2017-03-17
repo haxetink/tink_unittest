@@ -28,7 +28,7 @@ class TinkBatch #if !macro implements BatchObject #end {
 		return switch e.expr {
 			case EArrayDecl(values):
 				var suites = EArrayDecl(values.map(function(v) return macro tink.unit.impl.TinkSuite.make($v))).at(e.pos);
-				return macro new tink.unit.impl.TinkBatch($suites);
+				macro new tink.unit.impl.TinkBatch($suites);
 			default:
 				e.pos.error('Expected Array');
 		}
