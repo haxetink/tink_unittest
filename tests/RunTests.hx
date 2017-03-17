@@ -3,7 +3,6 @@ package;
 import tink.unit.*;
 import tink.unit.Assertion.*;
 import tink.unit.impl.*;
-import tink.unit.impl.TinkSuite.*;
 import travix.Logger.*;
 
 using tink.CoreApi;
@@ -26,10 +25,10 @@ class RunTests {
 		var _await = new AwaitTest();
 		var exclude = new ExcludeTest();
 		futures.push(
-			function() return Runner.run(new TinkBatch([
-				make(normal), 
-				make(_await), 
-				make(exclude),
+			function() return Runner.run(TinkBatch.make([
+				normal,
+				_await,
+				exclude,
 			])).map(function(result) {
 				code += result.errors().length;
 				if(normal.result != 'ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2dd2') oops();
@@ -44,10 +43,10 @@ class RunTests {
 		var _await = new AwaitTest();
 		var include = new IncludeTest();
 		futures.push(
-			function() return Runner.run(new TinkBatch([
-				make(normal), 
-				make(_await), 
-				make(include),
+			function() return Runner.run(TinkBatch.make([
+				normal, 
+				_await, 
+				include,
 			])).map(function(result) {
 				code += result.errors().length;
 				if(normal.result != '') oops();
