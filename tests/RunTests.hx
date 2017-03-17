@@ -13,9 +13,11 @@ class RunTests {
 		
 		var code = 0;
 		
-		function oops(?pos:haxe.PosInfos) {
-			trace(pos);
-			code++;
+		function assertEquals<T>(expected:T, actual:T, ?pos:haxe.PosInfos) {
+			if(expected != actual) {
+				println('${pos.fileName}:${pos.lineNumber}: Expected $expected but got $actual ');
+				code++;
+			}
 		}
 		
 		var futures = [];
@@ -30,10 +32,10 @@ class RunTests {
 				_await,
 				exclude,
 			])).map(function(result) {
-				code += result.errors().length;
-				if(normal.result != 'ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2dd2') oops();
-				if(_await.result != 'ss2bb2asyncaa2dd2') oops();
-				if(exclude.result != 'ss2bb2includeaa2dd2') oops();
+				assertEquals(0, result.errors().length);
+				assertEquals('ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2dd2', normal.result);
+				assertEquals('ss2bb2asyncaa2dd2', _await.result);
+				assertEquals('ss2bb2includeaa2dd2', exclude.result);
 				return Noise;
 			})
 		);
@@ -48,10 +50,10 @@ class RunTests {
 				_await, 
 				include,
 			])).map(function(result) {
-				code += result.errors().length;
-				if(normal.result != '') oops();
-				if(_await.result != '') oops();
-				if(include.result != 'ss2bb2includeaa2dd2') oops();
+				assertEquals(0, result.errors().length);
+				assertEquals('', normal.result);
+				assertEquals('', _await.result);
+				assertEquals('ss2bb2includeaa2dd2', include.result);
 				return Noise;
 			})
 		);

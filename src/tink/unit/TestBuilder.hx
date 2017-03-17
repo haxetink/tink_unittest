@@ -114,9 +114,9 @@ class TestBuilder {
 								{name: $v{suiteName}},
 								$a{tinkCases},
 								$a{runnables[Startup]},
-								$a{runnables[Shutdown]},
 								$a{runnables[Before]},
-								$a{runnables[After]}
+								$a{runnables[After]},
+								$a{runnables[Shutdown]}
 							);
 							this.test = test;
 						}

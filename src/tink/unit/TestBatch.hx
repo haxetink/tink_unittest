@@ -8,7 +8,7 @@ import haxe.macro.Expr;
 using tink.MacroApi;
 #end
 
-class TestBatch #if !macro extends BasicBatch #end {
+class TestBatch #if !macro extends BatchObject #end {
 	public static macro function make(e:Expr) {
 		return switch e.expr {
 			case EArrayDecl(values):

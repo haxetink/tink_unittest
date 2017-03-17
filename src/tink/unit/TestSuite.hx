@@ -16,7 +16,7 @@ class TestSuiteBase<T> extends TestSuite {
 }
 #end
 
-class TestSuite #if !macro extends BasicSuite #end {
+class TestSuite #if !macro extends SuiteObject #end {
 	public static macro function make(e:haxe.macro.Expr) {
 		var ct = haxe.macro.Context.toComplexType(haxe.macro.Context.typeof(e));
 		return macro new tink.unit.TestSuite.TestSuiteBuilder<$ct>($e);
