@@ -104,7 +104,8 @@ class TinkBuilder {
 						var befores = i == 0 ? macro startups.concat(befores) : macro befores;
 						var afters = i == cases.length - 1 ? macro afters.concat(shutdowns) : macro afters;
 						var info = macro {
-							description: $v{caze.description}
+							description: $v{caze.description},
+							timeout: $v{caze.timeout},
 						}
 						tinkCases.push(macro new tink.unit.impl.TinkCase($info, $befores, $afters, ${caze.runnable}, includeMode, $v{caze.include}));
 					}

@@ -7,4 +7,5 @@ typedef Case = {
 
 typedef CaseInfo = {
 	description:String,
+	timeout:Int, // ms
 }

@@ -19,7 +19,7 @@ using Lambda;
 using StringTools;
 
 interface Reporter {
-	function report(type:ReportType):Future<Noise>;
+	function report(type:ReportType):Future<Noise>; // reporter cannot fail, so it won't ruin the test
 }
 
 enum ReportType {
@@ -49,6 +49,12 @@ class BasicReporter implements Reporter {
 				println(indent(info.description, 2));
 				
 			case CaseFinish({results: results}):
+				for(r in results) {
+					switch r {
+						case Success(_):
+						case Failure(e): println(indent(e.toString(), 8));
+					}
+				}
 				
 			case SuiteFinish(result):
 				

@@ -8,6 +8,7 @@ class BasicCase {
 	public function new() {
 		info = {
 			description: Type.getClassName(Type.getClass(this)),
+			timeout: 5000,
 		}
 	}
 	
