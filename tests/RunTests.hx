@@ -13,7 +13,12 @@ class RunTests {
 		
 		var code = 0;
 		
+		
+		#if cs // https://github.com/HaxeFoundation/haxe/issues/6106
+		function assertEquals(expected:Dynamic, actual:Dynamic, ?pos:haxe.PosInfos) {
+		#else
 		function assertEquals<T>(expected:T, actual:T, ?pos:haxe.PosInfos) {
+		#end
 			if(expected != actual) {
 				println('${pos.fileName}:${pos.lineNumber}: Expected $expected but got $actual ');
 				code++;
