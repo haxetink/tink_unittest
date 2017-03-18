@@ -107,18 +107,27 @@ class TestBuilder {
 						tinkCases.push(macro new tink.unit.TestCase($info, ${caze.runnable}, $v{caze.timeout}, $v{caze.include}, $v{caze.exclude}));
 					}
 					
+					function makeServiceLoop(f:Array<Expr>) {
+						var fields = f.copy();
+						fields.reverse();
+						var expr = fields.fold(function(f, expr) return macro $f().handle(function(o) switch o {
+							case Success(_): $expr;
+							case Failure(e): cb(tink.core.Outcome.Failure(e));
+						}), macro cb(tink.core.Outcome.Success(tink.core.Noise.Noise.Noise)));
+						return macro tink.core.Future.async(function(cb) $expr);
+					}
+					
 					var def = macro class $clsname extends tink.unit.TestSuite.TestSuiteBase<$ct> {
+						
 						public function new(test:$ct) {
-							super(
-								{name: $v{suiteName}},
-								$a{tinkCases},
-								$a{runnables[Startup]},
-								$a{runnables[Before]},
-								$a{runnables[After]},
-								$a{runnables[Shutdown]}
-							);
+							super({name: $v{suiteName}}, $a{tinkCases});
 							this.test = test;
 						}
+						
+						override function startup() return ${makeServiceLoop(runnables[Startup])};
+						override function before() return ${makeServiceLoop(runnables[Before])};
+						override function after() return ${makeServiceLoop(runnables[After])};
+						override function shutdown() return ${makeServiceLoop(runnables[Shutdown])};
 					}
 					def.fields = def.fields.concat(fields); 
 					def.pack = ['tink', 'unit'];
