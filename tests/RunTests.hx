@@ -1,13 +1,14 @@
 package;
 
 import tink.testrunner.Runner;
-import tink.unit.Assertion;
-import tink.unit.Assertion.*;
+import tink.testrunner.Assertion;
 import tink.unit.TestBatch;
 import travix.Logger.*;
+import haxe.macro.Expr;
+import RunTests.assert;
 
 using tink.CoreApi;
-
+using haxe.macro.Tools;
 
 class RunTests {
 	static function main() {
@@ -75,6 +76,11 @@ class RunTests {
 			}
 		}
 		next();
+	}
+	
+	public static macro function assert(expr:ExprOf<Bool>, ?description:String):ExprOf<Assertion> {
+		if(description == null) description = expr.toString();
+		return macro new tink.testrunner.Assertion($expr, $v{description});
 	}
 }
 
