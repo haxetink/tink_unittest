@@ -2,19 +2,16 @@ package;
 
 import tink.testrunner.Runner;
 import tink.testrunner.Assertion;
+import tink.unit.Assert.assert;
 import tink.unit.TestBatch;
 import travix.Logger.*;
-import haxe.macro.Expr;
-import RunTests.assert;
 
 using tink.CoreApi;
-using haxe.macro.Tools;
 
 class RunTests {
 	static function main() {
 		
 		var code = 0;
-		
 		
 		#if (cs || java) // https://github.com/HaxeFoundation/haxe/issues/6106
 		function assertEquals(expected:Dynamic, actual:Dynamic, ?pos:haxe.PosInfos) {
@@ -65,7 +62,6 @@ class RunTests {
 			})
 		);
 		
-		
 		var iter = futures.iterator();
 		function next() {
 			if(iter.hasNext()) iter.next()().handle(next);
@@ -75,11 +71,6 @@ class RunTests {
 			}
 		}
 		next();
-	}
-	
-	public static macro function assert(expr:ExprOf<Bool>, ?description:String):ExprOf<Assertion> {
-		if(description == null) description = expr.toString();
-		return macro new tink.testrunner.Assertion($expr, $v{description});
 	}
 }
 
@@ -250,6 +241,6 @@ class ExcludeTest {
 
 	public function include() {
 		debug('include');
-		return assert(true);
+		return assert(true, 'Included');
 	}
 }
