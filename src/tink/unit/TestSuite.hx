@@ -7,7 +7,7 @@ import tink.testrunner.Suite;
 class TestSuiteBuilder<T> {}
 
 
-class TestSuiteBase<T> extends SuiteObject {
+class TestSuiteBase<T> extends BasicSuite {
 	var test:T;
 }
 #end
