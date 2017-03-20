@@ -40,8 +40,7 @@ class RunTests {
 				exclude,
 			])).map(function(result) {
 				assertEquals(0, result.failures().length);
-				// assertEquals('ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2dd2', normal.result);
-				assertEquals('ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2dd2', normal.result);
+				assertEquals('ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2dd2', normal.result);
 				assertEquals('ss2bb2asyncaa2dd2', _await.result);
 				assertEquals('ss2bb2includeaa2dd2', exclude.result);
 				return Noise;
@@ -145,11 +144,15 @@ class NormalTest {
 		return assert(true);
 	}
     
-	// @:describe('Multiple assertions')
-	// public function multiAssert() {
-	// 	debug('multiAssert');
-	// 	return assert(true) && assert(true) && assert(true);
-	// }
+	@:describe('Multiple assertions')
+	public function multiAssert() {
+		debug('multiAssert');
+		return [
+			assert(true),
+			assert(true),
+			assert(true),
+		];
+	}
 }
 
 @:await
