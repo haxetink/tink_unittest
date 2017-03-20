@@ -1,6 +1,7 @@
 package;
 
 import tink.testrunner.Runner;
+import tink.unit.Assertion;
 import tink.unit.Assertion.*;
 import tink.unit.TestBatch;
 import travix.Logger.*;
@@ -37,8 +38,9 @@ class RunTests {
 				_await,
 				exclude,
 			])).map(function(result) {
-				assertEquals(0, result.errors().length);
-				assertEquals('ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2dd2', normal.result);
+				assertEquals(0, result.errors().sure().length);
+				// assertEquals('ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2dd2', normal.result);
+				assertEquals('ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2dd2', normal.result);
 				assertEquals('ss2bb2asyncaa2dd2', _await.result);
 				assertEquals('ss2bb2includeaa2dd2', exclude.result);
 				return Noise;
@@ -55,7 +57,7 @@ class RunTests {
 				_await, 
 				include,
 			])).map(function(result) {
-				assertEquals(0, result.errors().length);
+				assertEquals(0, result.errors().sure().length);
 				assertEquals('', normal.result);
 				assertEquals('', _await.result);
 				assertEquals('ss2bb2includeaa2dd2', include.result);
@@ -101,32 +103,32 @@ class NormalTest {
 	@:describe("Sync test")
 	public function sync() {
 		debug('sync');
-		return true ? Success(Noise) : Failure(new Error('Errored!'));
+		return new Assertion(true, 'Always true');
 	}
 
 	@:describe('Sync test using Assert')
 	public function syncAssert() {
 		debug('syncAssert');
-		return isTrue(true);
+		return assert(true);
 	}
 		
 	@:describe('Async test')
 	public function async() {
 		debug('async');
-		return Future.sync(true ? Success(Noise) : Failure(new Error('Errored!')));
+		return Future.sync(new Assertion(true, 'Always true'));
 	}
 		
 	@:describe('Async test using Assert')
 	public function asyncAssert() {
 		debug('asyncAssert');
-		return Future.sync(isTrue(true));
+		return Future.sync(assert(true));
 	}
 		
 	@:timeout(1500) // in ms
 	@:describe('Timeout test')
 	public function timeout() {
 		debug('timeout');
-		return Future.async(function(cb) haxe.Timer.delay(function() cb(isTrue(true)), 1000));
+		return Future.async(function(cb) haxe.Timer.delay(function() cb(assert(true)), 1000));
 	}
 		
 	@:describe('Nest')
@@ -134,14 +136,14 @@ class NormalTest {
 	@:describe('    descriptions')
 	public function nestedDescriptions() {
 		debug('nestedDescriptions');
-		return isTrue(true);
+		return assert(true);
 	}
     
-	@:describe('Multiple assertions')
-	public function multiAssert() {
-		debug('multiAssert');
-		return isTrue(true) && isTrue(true) && isTrue(true);
-	}
+	// @:describe('Multiple assertions')
+	// public function multiAssert() {
+	// 	debug('multiAssert');
+	// 	return assert(true) && assert(true) && assert(true);
+	// }
 }
 
 @:await
@@ -170,7 +172,7 @@ class AwaitTest {
 	@:async public function async() {
 		debug('async');
 		var actual = @:await someAsyncValue();
-		return equals('actual', actual);
+		return assert(actual == 'actual');
 	}
   
   function someAsyncValue() 
@@ -201,12 +203,12 @@ class IncludeTest {
 	@:include
 	public function include() {
 		debug('include');
-		return isTrue(true);
+		return assert(true);
 	}
 
 	public function skip() {
 		debug('skip');
-		return isTrue(true);
+		return assert(true);
 	}
 }
 
@@ -234,11 +236,11 @@ class ExcludeTest {
 	@:exclude
 	public function exclude() {
 		debug('exclude');
-		return isTrue(true);
+		return assert(true);
 	}
 
 	public function include() {
 		debug('include');
-		return isTrue(true);
+		return assert(true);
 	}
 }

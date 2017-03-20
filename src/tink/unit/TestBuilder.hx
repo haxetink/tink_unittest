@@ -78,7 +78,7 @@ class TestBuilder {
 									timeout: timeout,
 									exclude: exclude,
 									include: include,
-									runnable: macro function():tink.testrunner.Assertions return test.$fname(),
+									runnable: macro @:pos(field.pos) function():tink.testrunner.Assertions return test.$fname(),
 								});
 							default:
 								var name = 'run_$fname';
