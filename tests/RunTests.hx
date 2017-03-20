@@ -37,7 +37,7 @@ class RunTests {
 				exclude,
 			])).map(function(result) {
 				assertEquals(0, result.summary().failures.length);
-				assertEquals('ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2bb2variant1aa2bb2variant2aa2dd2', normal.result);
+				assertEquals('ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2bb2variant1aa2bb2variant2aa2bb2variant3aa2dd2', normal.result);
 				assertEquals('ss2bb2asyncaa2dd2', _await.result);
 				assertEquals('ss2bb2includeaa2dd2', exclude.result);
 				return Noise;
@@ -76,6 +76,7 @@ class RunTests {
 
 @:name('Custom Test Name')
 class NormalTest {
+	public var myInt = 3;
 	public var result:String;
 	
 	public function new() {
@@ -148,6 +149,7 @@ class NormalTest {
 	@:describe('Variants')
 	@:variant("One and One"(1, 1))
 	@:variant(2, 2)
+	@:variant("Access this"(target.myInt, 3))
 	public function variant(a:Int, b:Int) {
 		debug('variant$a');
 		return assert(a == b);

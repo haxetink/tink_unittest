@@ -85,7 +85,7 @@ class TestBuilder {
 									timeout: timeout,
 									exclude: exclude,
 									include: include,
-									runnable: macro @:pos(field.pos) function():tink.testrunner.Assertions return test.$fname(),
+									runnable: macro @:pos(field.pos) function():tink.testrunner.Assertions return target.$fname(),
 								});
 								
 							case [Test, variants]:
@@ -94,7 +94,7 @@ class TestBuilder {
 									timeout: timeout,
 									exclude: exclude,
 									include: include,
-									runnable: macro @:pos(field.pos) function():tink.testrunner.Assertions return test.$fname($a{v.args}),
+									runnable: macro @:pos(field.pos) function():tink.testrunner.Assertions return target.$fname($a{v.args}),
 								});
 							
 							default:
@@ -105,7 +105,7 @@ class TestBuilder {
 									kind: FFun({
 										args: [],
 										ret: macro:tink.core.Promise<tink.core.Noise>,
-										expr: macro return test.$fname(),
+										expr: macro return target.$fname(),
 									}),
 									pos: field.pos,
 								});
@@ -136,9 +136,9 @@ class TestBuilder {
 					
 					var def = macro class $clsname extends tink.unit.TestSuite.TestSuiteBase<$ct> {
 						
-						public function new(test:$ct) {
+						public function new(target:$ct) {
 							super({name: $v{suiteName}}, $a{tinkCases});
-							this.test = test;
+							this.target = target;
 						}
 						
 						override function startup() return ${makeServiceLoop(runnables[Startup])};

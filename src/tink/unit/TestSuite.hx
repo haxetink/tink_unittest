@@ -8,7 +8,7 @@ class TestSuiteBuilder<T> {}
 
 
 class TestSuiteBase<T> extends BasicSuite {
-	var test:T;
+	var target:T;
 }
 #end
 
