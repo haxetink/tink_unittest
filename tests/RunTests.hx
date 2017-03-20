@@ -203,7 +203,8 @@ class IncludeTest {
 	@:include
 	public function include() {
 		debug('include');
-		return assert(true);
+		var value = 1;
+		return assert(value == 1);
 	}
 
 	public function skip() {
