@@ -66,13 +66,20 @@ class TestBuilder {
 							case v: [for(v in v) v.params[0].getString().sure()].join('\n');
 						}
 						var timeout = getTimeout(field.meta, clstimeout);
+						var variants = switch field.meta.extract(':variant') {
+							case []: [];
+							case v: [for(v in v) switch v.params {
+								case [{expr: ECall(e, params)}]: {description: '$description: ' + e.getString().sure(), args: params};
+								case p: {description: description, args: p}
+							}];
+						}
 						
 						var exclude = field.meta.extract(':exclude').length > 0;
 						var include = field.meta.extract(':include').length > 0;
 						if(include) includeMode = true;
 						
-						switch kind {
-							case Test: 
+						switch [kind, variants] {
+							case [Test, []]:
 								cases.push({
 									description: description,
 									timeout: timeout,
@@ -80,6 +87,16 @@ class TestBuilder {
 									include: include,
 									runnable: macro @:pos(field.pos) function():tink.testrunner.Assertions return test.$fname(),
 								});
+								
+							case [Test, variants]:
+								for(v in variants) cases.push({
+									description: v.description,
+									timeout: timeout,
+									exclude: exclude,
+									include: include,
+									runnable: macro @:pos(field.pos) function():tink.testrunner.Assertions return test.$fname($a{v.args}),
+								});
+							
 							default:
 								var name = 'run_$fname';
 								fields.push({
