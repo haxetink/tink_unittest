@@ -39,7 +39,7 @@ class RunTests {
 				_await,
 				exclude,
 			])).map(function(result) {
-				assertEquals(0, result.errors().sure().length);
+				assertEquals(0, result.failures().length);
 				// assertEquals('ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2dd2', normal.result);
 				assertEquals('ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2dd2', normal.result);
 				assertEquals('ss2bb2asyncaa2dd2', _await.result);
@@ -58,7 +58,7 @@ class RunTests {
 				_await, 
 				include,
 			])).map(function(result) {
-				assertEquals(0, result.errors().sure().length);
+				assertEquals(0, result.failures().length);
 				assertEquals('', normal.result);
 				assertEquals('', _await.result);
 				assertEquals('ss2bb2includeaa2dd2', include.result);
