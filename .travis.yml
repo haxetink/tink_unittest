@@ -15,6 +15,9 @@ matrix:
   allow_failures:
     - haxe: development
     
+env:
+  - secure: eft/zq63mlE8D4PbutphuJwOHmORi7Hf4lCGax/7wy60OeAd2YQc67fsN5iz4BhWFTzSohJamNdOgPYp3/bJcpclw8fCQhn8xTMlcvZpBAx8R7e5gDx/JCBf1O+Rswi9wIgOkJBnXK1JEZyIk7wqGHhQfEK4fPZibWxubXGg+Hj4vl/s9iWoH/yX7feBCEX1NNRJLrcCo0W1RYHhjlWdf07pjjsCnclgvVGCoJgX6q03VLsxgjrdQ/H11DSYSkZg9C7ipBbfxVL3NEm2nYjY5k7Vfb3uM3tCYKM+SCO7KAWNjZ/IOS5JVatIKDcacbBNgU0RDrJFEU4Ri7UwBzSBWfV675MR5FZy2RJJznIMHMKxcuIkip8Es3TO8HdCiwSdsjSCozrIEZyg3SvovSD4TpYQpAR/0I80sOznZR0KHO26V9+F0SUxCa6ZpCv0GctL0zdypqujOqLYbVy/NqE0foj5SNeXLBVaIGfCoBuzvYyVGWIy28Q2itdo0IObH4pf1ClQkMhFX5XYlyAB7kMNMss0oTYc2HN2SA6E1S44cP5yNxX2AEr2l2LEzWhavgGwTYe3RfqGG/EWCrE6535zuAqTB6kcesrAmIkJ7EXxfxsxkQup6hRnsbDdr52nUitzyc8u0xR1IXePxoh+yoJ/8Mhj7VHlxX8TNlz8CfRidow=
+    
 install:
   - haxelib install travix
   - haxelib run travix install
@@ -31,3 +34,6 @@ script:
   - haxelib run travix cs
   - haxelib run travix php
   - haxelib run travix lua
+
+after_success:
+  - haxelib run travix release

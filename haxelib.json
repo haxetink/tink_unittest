@@ -4,11 +4,12 @@
   "tags": [],
   "classPath": "src",
   "contributors": [
-    "kevinresol"
+    "kevinresol",
+    "back2dos"
   ],
   "releasenote": "initial release",
-  "version": "0.0.0",
-  "url": "https://github.com/kevinresol/tink_unittest/",
+  "version": "0.1.0",
+  "url": "https://github.com/haxetink/tink_unittest/",
   "dependencies": {
     "tink_testrunner": ""
   }
