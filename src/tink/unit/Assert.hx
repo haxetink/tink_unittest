@@ -9,24 +9,35 @@ using tink.MacroApi;
 #end
 
 class Assert {
+	static var printer = new haxe.macro.Printer();
+	
 	public static macro function assert(expr:ExprOf<Bool>, ?description:String):ExprOf<Assertion> {
-		if(description == null) {
-			description = expr.toString();
+		var pre = macro {};
+		var assertion = expr;
+		var desc = null;
+		
+		if(description != null)
+			desc = macro $v{description};
+		else {
+			desc = macro $v{expr.toString()};
 			switch expr.expr {
 				case EBinop(op, e1, e2):
 					
-					var operator = new haxe.macro.Printer().printBinop(op);
+					var operator = printer.printBinop(op);
 					var operation = EBinop(op, macro lh, macro rh).at(expr.pos);
-					var lt = Context.typeof(e1).toComplex();
-					var rt = Context.typeof(e2).toComplex();
-
-					return macro (function(lh:$lt, rh:$rt) {
-						return new tink.testrunner.Assertion($operation, $v{description} + ' (' + lh + ' ' + $v{operator} + ' ' + rh + ')');
-					})($e1, $e2);
-				default:
 					
+					pre = macro {
+						// store the values to avoid evaluating the expressions twice
+						var lh = $e1; 
+						var rh = $e2;
+					}
+					assertion = operation;
+					desc = macro $desc + ' (' + lh + ' ' + $v{operator} + ' ' + rh + ')';
+					
+				default:
 			}	
 		}
-		return macro new tink.testrunner.Assertion($expr, $v{description});
+		
+		return pre.concat(macro new tink.testrunner.Assertion($assertion, $desc));
 	}
 }
