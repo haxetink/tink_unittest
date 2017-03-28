@@ -139,11 +139,18 @@ class NormalTest {
 	@:describe('Multiple assertions')
 	public function multiAssert() {
 		debug('multiAssert');
-		return [
-			assert(true),
-			assert(true),
-			assert(true),
-		];
+		var asserts = new tink.streams.Accumulator();
+		
+		var timer = new haxe.Timer(500);
+		var i = 0;
+		timer.run = function()
+			if(i++ < 3) asserts.yield(Data(assert(true)));
+			else {
+				asserts.yield(End);
+				timer.stop();
+			}
+		
+		return asserts;
 	}
 	
 	@:describe('Variants')
