@@ -3,6 +3,7 @@ package;
 import tink.testrunner.Runner;
 import tink.testrunner.Assertion;
 import tink.unit.Assert.assert;
+import tink.unit.AssertionBuffer;
 import tink.unit.TestBatch;
 import travix.Logger.*;
 
@@ -137,16 +138,15 @@ class NormalTest {
 	}
     
 	@:describe('Multiple assertions')
-	public function multiAssert() {
+	public function multiAssert(asserts:AssertionBuffer) {
 		debug('multiAssert');
-		var asserts = new tink.streams.Accumulator();
 		
 		var timer = new haxe.Timer(500);
 		var i = 0;
 		timer.run = function()
-			if(i++ < 3) asserts.yield(Data(assert(true)));
+			if(i++ < 3) asserts.assert(true);
 			else {
-				asserts.yield(End);
+				asserts.done();
 				timer.stop();
 			}
 		

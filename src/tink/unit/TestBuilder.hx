@@ -78,24 +78,45 @@ class TestBuilder {
 						var include = field.meta.extract(':include').length > 0;
 						if(include) includeMode = true;
 						
+						// inject AssertionBuffer
+						var bufferIndex = -1;
+						function prepareBuffer(type) {
+							switch type {
+								case TFun(args, ret):
+									trace(args);
+									for(i in 0...args.length)
+										if(Context.unify(args[i].t, Context.getType('tink.unit.AssertionBuffer'))) {
+											bufferIndex = i;
+											break;
+										}
+								case TLazy(f): prepareBuffer(f());
+								default:
+							}
+						}
+						prepareBuffer(field.type);
+						
 						switch [kind, variants] {
 							case [Test, []]:
+								var args = bufferIndex == -1 ? [] : [macro new tink.unit.AssertionBuffer()];
 								cases.push({
 									description: description,
 									timeout: timeout,
 									exclude: exclude,
 									include: include,
-									runnable: macro @:pos(field.pos) function():tink.testrunner.Assertions return target.$fname(),
+									runnable: macro @:pos(field.pos) function():tink.testrunner.Assertions return target.$fname($a{args}),
 								});
 								
 							case [Test, variants]:
-								for(v in variants) cases.push({
-									description: v.description,
-									timeout: timeout,
-									exclude: exclude,
-									include: include,
-									runnable: macro @:pos(field.pos) function():tink.testrunner.Assertions return target.$fname($a{v.args}),
-								});
+								for(v in variants) {
+									if(bufferIndex != -1) v.args.insert(bufferIndex, macro new tink.unit.AssertionBuffer());
+									cases.push({
+										description: v.description,
+										timeout: timeout,
+										exclude: exclude,
+										include: include,
+										runnable: macro @:pos(field.pos) function():tink.testrunner.Assertions return target.$fname($a{v.args}),
+									});
+								}
 							
 							default:
 								var name = 'run_$fname';
