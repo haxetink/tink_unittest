@@ -15,6 +15,8 @@ abstract AssertionBuffer(Accumulator<Assertion>) to Assertions {
 	public inline function emit(assertion:Assertion)
 		this.yield(Data(assertion));
 	
-	public inline function done() 
+	public inline function done():Assertions {
 		this.yield(End);
+		return this;
+	}
 }
