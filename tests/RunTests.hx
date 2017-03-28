@@ -31,16 +31,25 @@ class RunTests {
 		var normal = new NormalTest();
 		var _await = new AwaitTest();
 		var exclude = new ExcludeTest();
+		var grandParent = new GrandParentTest();
+		var parent = new ParentTest();
+		var child = new ChildTest();
 		futures.push(
 			function() return Runner.run(TestBatch.make([
 				normal,
 				_await,
 				exclude,
+				grandParent,
+				parent,
+				child,
 			])).map(function(result) {
 				assertEquals(0, result.summary().failures.length);
 				assertEquals('ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2bb2variant1aa2bb2variant2aa2bb2variant3aa2dd2', normal.result);
 				assertEquals('ss2bb2asyncaa2dd2', _await.result);
 				assertEquals('ss2bb2includeaa2dd2', exclude.result);
+				assertEquals('ss2grandParentdd2', grandParent.result);
+				assertEquals('ss2bb2grandParentaa2bb2parentaa2dd2', parent.result);
+				assertEquals('ss2bb2grandParentaa2bb2parentaa2bb2childaa2dd2', child.result);
 				return Noise;
 			})
 		);
@@ -260,5 +269,49 @@ class ExcludeTest {
 	public function include() {
 		debug('include');
 		return assert(true, 'Included');
+	}
+}
+
+class GrandParentTest {
+	public var result:String;
+	
+	public function new() {
+		result = '';
+	}
+	
+	function debug(msg:String) {
+		result += msg;
+		return Noise;
+	}
+	@:startup public function startup() return debug('s');
+	@:startup public function startup2() return debug('s2');
+	@:shutdown public function shutdown() return debug('d');
+	@:shutdown public function shutdown2() return debug('d2');
+		
+	
+	public function grandParent() {
+		debug('grandParent');
+		return assert(true);
+	}
+}
+
+class ParentTest extends GrandParentTest {
+	
+	@:before public function before() return debug('b');
+	@:before public function before2() return debug('b2');
+	@:after public function after() return debug('a');
+	@:after public function after2() return debug('a2');
+		
+	
+	public function parent() {
+		debug('parent');
+		return assert(true);
+	}
+}
+
+class ChildTest extends ParentTest {
+	public function child() {
+		debug('child');
+		return assert(true);
 	}
 }

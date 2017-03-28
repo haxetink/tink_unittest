@@ -5,6 +5,7 @@ import haxe.macro.Type;
 import haxe.macro.Expr;
 
 using Lambda;
+using tink.CoreApi;
 #if macro
 using tink.MacroApi;
 #end
@@ -12,6 +13,7 @@ using tink.MacroApi;
 class TestBuilder {
 	
 	static var cache = new TypeMap();
+	static var infos = new TypeMap();
 	static var counter = 0;
 	
 	public static function build() {
@@ -19,21 +21,11 @@ class TestBuilder {
 			case TInst(_, [type]): 
 				if(!cache.exists(type)) {
 					
-					var cls = switch type {
-						case TInst(_.get() => cls, _): cls;
-						default: throw 'assert';
-					}
-					
+					var info = process(type);
 					var clsname = 'Suite_' + counter++;
-					
-					var suiteName = switch cls.meta.extract(':name') {
-						case []: cls.name;
-						case [{params: [p]}]: p.getString().sure();
-						case v: v[0].pos.error('Expected only one @:name metadata with exactly one parameter');
-					}
-					
-					var clstimeout = getTimeout(cls.meta);
-					var ct = type.toComplex();
+					var cases = [];
+					var fields = [];
+					var includeMode = false;
 					var runnables = [
 						Startup => [],
 						Shutdown => [],
@@ -41,80 +33,29 @@ class TestBuilder {
 						After => [],
 					];
 					
-					var cases = [];
-					
-					var includeMode = false;
-					
-					var fields = [];
-					for(field in cls.fields.get()) if(field.isPublic && field.kind.match(FMethod(_))) {
-						var fname = field.name;
-						
-						var kind:Kind = null;
-						function checkKind(meta:String, k:Kind) switch field.meta.extract(meta) {
-							case []: // ok
-							case v if(kind == null): kind = k;
-							case v: v[0].pos.error('Cannot declare @$meta and @:${Std.string(kind).toLowerCase()} on the same function');
-						}
-						checkKind(':startup', Startup);
-						checkKind(':shutdown', Shutdown);
-						checkKind(':before', Before);
-						checkKind(':after', After);
-						if(kind == null) kind = Test;
-						
-						var description = switch field.meta.extract(':describe') {
-							case []: fname;
-							case v: [for(v in v) v.params[0].getString().sure()].join('\n');
-						}
-						var timeout = getTimeout(field.meta, clstimeout);
-						var variants = switch field.meta.extract(':variant') {
-							case []: [];
-							case v: [for(v in v) switch v.params {
-								case [{expr: ECall(e, params)}]: {description: '$description: ' + e.getString().sure(), args: params};
-								case p: {description: description, args: p}
-							}];
-						}
-						
-						var exclude = field.meta.extract(':exclude').length > 0;
-						var include = field.meta.extract(':include').length > 0;
-						if(include) includeMode = true;
-						
-						// inject AssertionBuffer
-						var bufferIndex = -1;
-						function prepareBuffer(type) {
-							switch type {
-								case TFun(args, ret):
-									trace(args);
-									for(i in 0...args.length)
-										if(Context.unify(args[i].t, Context.getType('tink.unit.AssertionBuffer'))) {
-											bufferIndex = i;
-											break;
-										}
-								case TLazy(f): prepareBuffer(f());
-								default:
-							}
-						}
-						prepareBuffer(field.type);
-						
-						switch [kind, variants] {
+					for(field in info.fields) {
+						var fname = field.field.name;
+						switch [field.kind, field.variants] {
 							case [Test, []]:
-								var args = bufferIndex == -1 ? [] : [macro new tink.unit.AssertionBuffer()];
+								var args = field.bufferIndex == -1 ? [] : [macro new tink.unit.AssertionBuffer()];
 								cases.push({
-									description: description,
-									timeout: timeout,
-									exclude: exclude,
-									include: include,
-									runnable: macro @:pos(field.pos) function():tink.testrunner.Assertions return target.$fname($a{args}),
+									description: field.description,
+									timeout: field.timeout,
+									exclude: field.exclude,
+									include: field.include,
+									runnable: macro @:pos(field.field.pos) function():tink.testrunner.Assertions return target.$fname($a{args}),
 								});
 								
 							case [Test, variants]:
 								for(v in variants) {
-									if(bufferIndex != -1) v.args.insert(bufferIndex, macro new tink.unit.AssertionBuffer());
+									var args = v.args.copy();
+									if(field.bufferIndex != -1) args.insert(field.bufferIndex, macro new tink.unit.AssertionBuffer());
 									cases.push({
 										description: v.description,
-										timeout: timeout,
-										exclude: exclude,
-										include: include,
-										runnable: macro @:pos(field.pos) function():tink.testrunner.Assertions return target.$fname($a{v.args}),
+										timeout: field.timeout,
+										exclude: field.exclude,
+										include: field.include,
+										runnable: macro @:pos(field.field.pos) function():tink.testrunner.Assertions return target.$fname($a{args}),
 									});
 								}
 							
@@ -128,17 +69,17 @@ class TestBuilder {
 										ret: macro:tink.core.Promise<tink.core.Noise>,
 										expr: macro return target.$fname(),
 									}),
-									pos: field.pos,
+									pos: field.field.pos,
 								});
-								runnables[kind].push(macro $i{name});
+								runnables[field.kind].push(macro $i{name});
 						}
 					}
-					
 					
 					cases = cases.filter(function(c) return !c.exclude && (!includeMode || c.include));
 					var tinkCases = [];
 					for(i in 0...cases.length) {
 						var caze = cases[i];
+						if(!includeMode && caze.include) includeMode = true;
 						var info = macro {
 							description: $v{caze.description},
 						}
@@ -155,10 +96,11 @@ class TestBuilder {
 						return macro tink.core.Future.async(function(cb) $expr);
 					}
 					
+					var ct = type.toComplex();
 					var def = macro class $clsname extends tink.unit.TestSuite.TestSuiteBase<$ct> {
 						
 						public function new(target:$ct) {
-							super({name: $v{suiteName}}, $a{tinkCases});
+							super({name: $v{info.name}}, $a{tinkCases});
 							this.target = target;
 						}
 						
@@ -179,7 +121,103 @@ class TestBuilder {
 		}
 	}
 	
-	static function getTimeout(meta:MetaAccess, def = 5000)
+	static function process(type:Type):TestInfo {
+		if(!infos.exists(type)) {
+			
+			var cls = switch type {
+				case TInst(_.get() => cls, _): cls;
+				default: throw 'assert';
+			}
+			
+			var suiteName = switch cls.meta.extract(':name') {
+				case []: cls.name;
+				case [{params: [p]}]: p.getString().sure();
+				case v: v[0].pos.error('Expected only one @:name metadata with exactly one parameter');
+			}
+			
+			var fields = [];
+			var clstimeout = 5000;
+			
+			if(cls.superClass != null) {
+				var s = cls.superClass.t.get();
+				var sinfo = process(Context.getType('${s.module}.${s.name}'));
+				clstimeout = sinfo.timeout;
+				fields = sinfo.fields.copy();
+			}
+			
+			clstimeout = getTimeout(cls.meta, clstimeout);
+					
+			for(field in cls.fields.get()) if(field.isPublic && field.kind.match(FMethod(_))) {
+				var fname = field.name;
+				
+				var kind:Kind = null;
+				function checkKind(meta:String, k:Kind) switch field.meta.extract(meta) {
+					case []: // ok
+					case v if(kind == null): kind = k;
+					case v: v[0].pos.error('Cannot declare @$meta and @:${Std.string(kind).toLowerCase()} on the same function');
+				}
+				checkKind(':startup', Startup);
+				checkKind(':shutdown', Shutdown);
+				checkKind(':before', Before);
+				checkKind(':after', After);
+				if(kind == null) kind = Test;
+				
+				var description = switch field.meta.extract(':describe') {
+					case []: fname;
+					case v: [for(v in v) v.params[0].getString().sure()].join('\n');
+				}
+				var timeout = getTimeout(field.meta, clstimeout);
+				var variants = switch field.meta.extract(':variant') {
+					case []: [];
+					case v: [for(v in v) switch v.params {
+						case [{expr: ECall(e, params)}]: {description: '$description: ' + e.getString().sure(), args: params};
+						case p: {description: description, args: p}
+					}];
+				}
+				
+				var exclude = field.meta.extract(':exclude').length > 0;
+				var include = field.meta.extract(':include').length > 0;
+				
+				// inject AssertionBuffer
+				var bufferIndex = -1;
+				function prepareBuffer(type) {
+					switch type {
+						case TFun(args, ret):
+							for(i in 0...args.length)
+								if(Context.unify(args[i].t, Context.getType('tink.unit.AssertionBuffer'))) {
+									bufferIndex = i;
+									break;
+								}
+						case TLazy(f): prepareBuffer(f());
+						default:
+					}
+				}
+				prepareBuffer(field.type);
+				
+				fields.push({
+					field: field,
+					kind: kind,
+					include: include,
+					exclude: exclude,
+					variants: variants,
+					bufferIndex: bufferIndex,
+					description: description,
+					timeout: timeout,
+				});
+			}
+			
+			infos.set(type, {
+				type: type,
+				name: suiteName,
+				timeout: clstimeout,
+				fields: fields,
+			});
+		}
+		
+		return infos.get(type);
+	}
+	
+	static function getTimeout(meta:MetaAccess, def:Int)
 		return switch meta.extract(':timeout') {
 			case []: def;
 			case [v]: switch v.params {
@@ -191,7 +229,23 @@ class TestBuilder {
 		} 
 }
 
-enum Kind {
+private typedef TestInfo = {
+	type:Type,
+	name:String,
+	timeout:Int,
+	fields:Array<{
+		field:ClassField,
+		kind:Kind,
+		include:Bool,
+		exclude:Bool,
+		variants:Array<{description:String, args:Array<Expr>}>,
+		bufferIndex:Int,
+		description:String,
+		timeout:Int,
+	}>,
+}
+
+private enum Kind {
 	Startup;
 	Shutdown;
 	Before;
