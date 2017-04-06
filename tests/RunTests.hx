@@ -3,7 +3,6 @@ package;
 import tink.testrunner.Runner;
 import tink.testrunner.Assertion;
 import tink.unit.Assert.assert;
-import tink.unit.AssertionBuffer;
 import tink.unit.TestBatch;
 import travix.Logger.*;
 
@@ -84,6 +83,7 @@ class RunTests {
 	}
 }
 
+@:asserts
 @:name('Custom Test Name')
 class NormalTest {
 	public var myInt = 3;
@@ -147,7 +147,7 @@ class NormalTest {
 	}
     
 	@:describe('Multiple assertions')
-	public function multiAssert(asserts:AssertionBuffer) {
+	public function multiAssert() {
 		debug('multiAssert');
 		
 		var timer = new haxe.Timer(500);
@@ -158,7 +158,6 @@ class NormalTest {
 				asserts.done();
 				timer.stop();
 			}
-		
 		return asserts;
 	}
 	
