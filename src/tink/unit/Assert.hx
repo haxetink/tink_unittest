@@ -38,6 +38,6 @@ class Assert {
 			}	
 		}
 		
-		return pre.concat(macro new tink.testrunner.Assertion($assertion, $desc));
+		return pre.concat(macro @:pos(expr.pos) new tink.testrunner.Assertion($assertion, $desc));
 	}
 }
