@@ -7,10 +7,11 @@
     "kevinresol",
     "back2dos"
   ],
-  "releasenote": "Support super class",
-  "version": "0.3.0",
+  "releasenote": "Use macro to inject AssertionBuffer to test functions",
+  "version": "0.4.0",
   "url": "https://github.com/haxetink/tink_unittest/",
   "dependencies": {
-    "tink_testrunner": ""
+    "tink_testrunner": "",
+    "tink_syntaxhub": ""
   }
 }

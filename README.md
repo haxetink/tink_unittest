@@ -98,3 +98,54 @@ class AwaitTest {
 		return Future.async(function(cb) haxe.Timer.delay(function() cb('actual'), 1000));
 }
 ```
+
+#### Test Methods
+
+All public method without the following metadata is considered a test method:
+
+- `@:startup`
+- `@:before`
+- `@:after`
+- `@:shutdown`
+
+Each test method should return a value that can be casted to `tink.testrunner.Assertions`.
+There are multiple ways in doing so, the simplest way is to return a single `tink.testrunner.Assertion`:
+
+```haxe
+return new Assertion(true, 'Some description);
+// or
+return tink.unit.Assert.assert(true);
+```
+
+You can also return an `Array<Assertion>`
+
+```haxe
+return [for(i in 0...10) new Assertion(true, 'Some description)];
+// or
+return [for(i in 0...10) tink.unit.Assert.assert(true)];
+```
+
+You can also use an `AssertionBuffer`
+
+```haxe
+var asserts = new AssertionBuffer();
+asserts.assert(true);
+asserts.assert(true);
+asserts.assert(true);
+return asserts.done();
+```
+
+To save some typing, you can tag the class with `@:asserts`, then a `asserts:AssertionBuffer`
+argument will be automatically injected to each of the test methods;
+
+```haxe
+@:asserts
+class MyTest {
+	public function testSomething() {
+		asserts.assert(true);
+		asserts.assert(true);
+		asserts.assert(true);
+		return asserts.done();
+	}
+}
+```
