@@ -15,6 +15,7 @@ class TestBuilder {
 	static var cache = new TypeMap();
 	static var infos = new TypeMap();
 	static var counter = 0;
+	static var POS_REGEX = ~/#pos([^:]*):([^:]*).*/;
 	
 	public static function build() {
 		switch Context.getLocalType() {
@@ -35,6 +36,19 @@ class TestBuilder {
 					
 					for(field in info.fields) {
 						var fname = field.field.name;
+						
+						function transformPos(p:Position) {
+							return if(POS_REGEX.match(Std.string(p))) {
+								lineNumber: Std.parseInt(POS_REGEX.matched(2)),
+								fileName: POS_REGEX.matched(1).split('/').pop(),
+								methodName: fname,
+								className: switch info.type {
+									case TInst(_.get() => {name: name}, _): name;
+									default: null;
+								}
+							} else null;
+						}
+						
 						switch [field.kind, field.variants] {
 							case [Test, []]:
 								var args = field.bufferIndex == -1 ? [] : [macro new tink.unit.AssertionBuffer()];
@@ -43,6 +57,7 @@ class TestBuilder {
 									timeout: field.timeout,
 									exclude: field.exclude,
 									include: field.include,
+									pos: transformPos(field.field.pos),
 									runnable: macro @:pos(field.field.pos) function():tink.testrunner.Assertions return target.$fname($a{args}),
 								});
 								
@@ -55,6 +70,7 @@ class TestBuilder {
 										timeout: field.timeout,
 										exclude: field.exclude,
 										include: field.include,
+										pos: transformPos(field.field.pos),
 										runnable: macro @:pos(field.field.pos) function():tink.testrunner.Assertions return target.$fname($a{args}),
 									});
 								}
@@ -83,7 +99,15 @@ class TestBuilder {
 						var info = macro {
 							description: $v{caze.description},
 						}
-						tinkCases.push(macro new tink.unit.TestCase($info, ${caze.runnable}, $v{caze.timeout}, $v{caze.include}, $v{caze.exclude}));
+						tinkCases.push(macro {
+							var pos = {
+								lineNumber: $v{caze.pos.lineNumber},
+								fileName: $v{caze.pos.fileName},
+								methodName: $v{caze.pos.methodName},
+								className: $v{caze.pos.className},
+							}
+							new tink.unit.TestCase($info, ${caze.runnable}, $v{caze.timeout}, $v{caze.include}, $v{caze.exclude}, pos);
+						});
 					}
 					
 					function makeServiceLoop(f:Array<Expr>) {
