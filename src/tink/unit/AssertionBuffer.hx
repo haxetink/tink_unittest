@@ -21,11 +21,22 @@ abstract AssertionBuffer(Accumulator<Assertion>) to Assertions {
 		
 	public inline function emit(assertion:Assertion)
 		this.yield(Data(assertion));
+		
+	public inline function fail(description:FailingReason, ?pos:haxe.PosInfos) {
+		emit(new Assertion(false, description, pos));
+		return done();
+	}
 	
 	public inline function done():Assertions {
 		this.yield(End);
 		return this;
 	}
+}
+
+abstract FailingReason(String) from String to String {
+	@:from
+	public static inline function ofError(e:tink.core.Error):FailingReason
+		return e.toString();
 }
 
 #if macro

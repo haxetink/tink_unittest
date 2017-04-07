@@ -13,8 +13,8 @@ class TestSuiteBase<T> extends BasicSuite {
 #end
 
 class TestSuite {
-	public static macro function make(e:haxe.macro.Expr) {
+	public static macro function make(e:haxe.macro.Expr, ?name:String) {
 		var ct = haxe.macro.Context.toComplexType(haxe.macro.Context.typeof(e));
-		return macro new tink.unit.TestSuite.TestSuiteBuilder<$ct>($e);
+		return macro new tink.unit.TestSuite.TestSuiteBuilder<$ct>($e, $v{name});
 	}
 }

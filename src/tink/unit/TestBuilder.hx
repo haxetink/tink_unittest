@@ -123,8 +123,8 @@ class TestBuilder {
 					var ct = type.toComplex();
 					var def = macro class $clsname extends tink.unit.TestSuite.TestSuiteBase<$ct> {
 						
-						public function new(target:$ct) {
-							super({name: $v{info.name}}, $a{tinkCases});
+						public function new(target:$ct, ?name:String) {
+							super({name: name == null ? $v{info.name} : name} , $a{tinkCases});
 							this.target = target;
 						}
 						
