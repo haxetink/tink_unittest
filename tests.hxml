@@ -2,4 +2,4 @@
 -main RunTests
 
 -dce full
--lib tink_await
+# -lib tink_await # TODO: re-enable this and remove dep from haxelib.json - https://github.com/haxetink/tink_syntaxhub/issues/5

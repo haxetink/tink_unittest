@@ -11,7 +11,8 @@
   "version": "0.4.0",
   "url": "https://github.com/haxetink/tink_unittest/",
   "dependencies": {
-    "tink_testrunner": "",
-    "tink_syntaxhub": ""
+    "tink_syntaxhub": "",
+    "tink_await": "",
+    "tink_testrunner": ""
   }
 }

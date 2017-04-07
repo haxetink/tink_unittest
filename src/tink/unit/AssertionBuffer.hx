@@ -32,8 +32,7 @@ abstract AssertionBuffer(Accumulator<Assertion>) to Assertions {
 class AssertionBufferInjector {
 	public static function use() {
 		function appliesTo(m:MetaAccess) return m.has(':asserts');
-		
-		SyntaxHub.classLevel.after(
+		SyntaxHub.classLevel.before(
 			function (_) return true,
 			function (c: ClassBuilder) {
 				if (c.target.isInterface && !appliesTo(c.target.meta))
