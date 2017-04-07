@@ -20,6 +20,8 @@ class Assert {
 			desc = macro $v{description};
 		else {
 			desc = macro $v{expr.toString()};
+			
+			// TODO: we can actually do a recursive breakdown: e.g. `a == 1 && b == 2`
 			switch expr.expr {
 				case EBinop(op, e1, e2):
 					
