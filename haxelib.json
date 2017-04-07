@@ -8,7 +8,7 @@
     "back2dos"
   ],
   "releasenote": "Use macro to inject AssertionBuffer to test functions",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "url": "https://github.com/haxetink/tink_unittest/",
   "dependencies": {
     "tink_syntaxhub": "",
