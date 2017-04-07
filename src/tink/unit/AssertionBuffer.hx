@@ -11,7 +11,7 @@ using tink.MacroApi;
 using Lambda;
 #end
 
-abstract AssertionBuffer(Accumulator<Assertion>) to Assertions {
+abstract AssertionBuffer(Accumulator<Assertion, tink.core.Error>) to Assertions {
 	public inline function new()
 		this = new Accumulator();
 		
