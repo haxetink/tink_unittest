@@ -171,7 +171,7 @@ class TestBuilder {
 					case []: [];
 					case v: [for(v in v) switch v.params {
 						case [{expr: ECall(e, params)}]: {description: '$description: ' + e.getString().sure(), args: params};
-						case p: {description: description, args: p}
+						case p: {description: '$description: ' + [for(e in p) e.toString()].join(', '), args: p}
 					}];
 				}
 				
