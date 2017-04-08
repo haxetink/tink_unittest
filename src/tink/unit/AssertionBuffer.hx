@@ -4,103 +4,37 @@ import tink.testrunner.*;
 import tink.streams.Accumulator;
 import haxe.macro.Expr;
 
-#if macro
-using haxe.macro.Expr;
-using haxe.macro.Type;
-using tink.MacroApi;
-using Lambda;
-#end
+using tink.CoreApi;
 
 abstract AssertionBuffer(Accumulator<Assertion, tink.core.Error>) to Assertions {
-	public inline function new()
-		this = new Accumulator();
-		
+	
 	public macro function assert(ethis:Expr, expr:ExprOf<Bool>, ?description:String):ExprOf<Assertion> {
 		return macro $ethis.emit(tink.unit.Assert.assert($expr, $v{description}));
 	}
 		
+	#if !macro
+	public inline function new()
+		this = new Accumulator();
+		
 	public inline function emit(assertion:Assertion)
 		this.yield(Data(assertion));
 		
-	public inline function fail(description:FailingReason, ?pos:haxe.PosInfos) {
-		emit(new Assertion(false, description, pos));
-		return done();
+	public inline function fail(?code:Int, reason:FailingReason, ?pos:haxe.PosInfos) {
+		if(code == null) code = reason.code;
+		this.yield(Fail(new Error(code, reason.message, pos)));
+		return this;
 	}
 	
 	public inline function done():Assertions {
 		this.yield(End);
 		return this;
 	}
+	#end
 }
 
-abstract FailingReason(String) from String to String {
+@:forward
+abstract FailingReason(Error) from Error to Error {
 	@:from
-	public static inline function ofError(e:tink.core.Error):FailingReason
-		return e.toString();
+	public static inline function ofString(e:String):FailingReason
+		return new Error(e);
 }
-
-#if macro
-class AssertionBufferInjector {
-	public static function use() {
-		function appliesTo(m:MetaAccess) return m.has(':asserts');
-		SyntaxHub.classLevel.before(
-			function (_) return true,
-			function (c: ClassBuilder) {
-				if (c.target.isInterface && !appliesTo(c.target.meta))
-					return false;
-				
-				if (!appliesTo(c.target.meta)) {
-					for (i in c.target.interfaces)
-						if (appliesTo(i.t.get().meta)) {
-							applyTo(c);
-							return true;
-						}
-					var s = c.target.superClass;
-					while(s != null) {
-						var sc = s.t.get();
-						if(appliesTo(sc.meta)) {
-							applyTo(c);
-							return true;
-						}
-						s = sc.superClass;
-					}
-					return false;
-				}
-				else {
-					applyTo(c);
-					return true;
-				}
-			}
-		);
-	}
-	
-	static function applyTo(builder:ClassBuilder) {
-		for(member in builder) {
-			
-			function isTest(member:Member) {
-				var meta = member.asField().meta;
-				return !meta.exists(function(m) return 
-					m.name == ':startup' || 
-					m.name == ':shutdown' || 
-					m.name == ':before' || 
-					m.name == ':after' ||
-					m.name == ':exclude' 
-				);
-			}
-			
-			if(member.isPublic && !member.isStatic && isTest(member))
-				switch member.getFunction() {
-					case Success(func):
-						if(func.args.exists(function(a) return a.name == 'asserts'))
-							haxe.macro.Context.warning('Skip injecting AssertionBuffer because there is already an argument named "asserts"', member.pos);
-						else
-							func.args.push({
-								name: 'asserts',
-								type: macro:tink.unit.AssertionBuffer,
-							});
-					case Failure(_): // skip
-				}
-		}
-	}
-}
-#end
