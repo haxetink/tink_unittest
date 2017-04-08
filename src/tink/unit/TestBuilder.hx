@@ -45,7 +45,8 @@ class TestBuilder {
 							case [Test, []]:
 								var args = field.bufferIndex == -1 ? [] : [macro new tink.unit.AssertionBuffer()];
 								cases.push({
-									description: field.description,
+									name: field.description,
+									description: null,
 									timeout: field.timeout,
 									exclude: field.exclude,
 									include: field.include,
@@ -58,11 +59,12 @@ class TestBuilder {
 									var args = v.args.copy();
 									if(field.bufferIndex != -1) args.insert(field.bufferIndex, macro new tink.unit.AssertionBuffer());
 									cases.push({
+										name: field.description,
 										description: v.description,
 										timeout: field.timeout,
 										exclude: field.exclude,
 										include: field.include,
-										pos: transformPos(field.field.pos, fname, cname),
+										pos: transformPos(v.pos, fname, cname),
 										runnable: macro @:pos(field.field.pos) function():tink.testrunner.Assertions return target.$fname($a{args}),
 									});
 								}
@@ -89,7 +91,14 @@ class TestBuilder {
 						var caze = cases[i];
 						if(!includeMode && caze.include) includeMode = true;
 						var info = macro {
+							name: $v{caze.name},
 							description: $v{caze.description},
+							pos: {
+								lineNumber: $v{caze.pos.lineNumber},
+								fileName: $v{caze.pos.fileName},
+								methodName: $v{caze.pos.methodName},
+								className: $v{caze.pos.className},
+							}
 						}
 						tinkCases.push(macro {
 							var pos = {
@@ -195,8 +204,8 @@ class TestBuilder {
 								desc = [for(e in p) e.toString()].join(', ');
 								args = p;
 						}
-						var pos = transformPos(v.pos);
-						{description: '$description: $desc [${pos.fileName}:${pos.lineNumber}]', args: args};
+						
+						{description: desc, pos: v.pos, args: args}
 					}];
 				}
 				
@@ -275,7 +284,7 @@ private typedef TestInfo = {
 		kind:Kind,
 		include:Bool,
 		exclude:Bool,
-		variants:Array<{description:String, args:Array<Expr>}>,
+		variants:Array<{description:String, pos:Position, args:Array<Expr>}>,
 		bufferIndex:Int,
 		description:String,
 		timeout:Int,

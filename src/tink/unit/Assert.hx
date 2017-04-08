@@ -40,6 +40,11 @@ class Assert {
 			}	
 		}
 		
-		return pre.concat(macro @:pos(expr.pos) new tink.testrunner.Assertion($assertion, $desc, $pos));
+		var args = [assertion, desc];
+		switch pos {
+			case macro null: // skip
+			case v: args.push(v);
+		}
+		return pre.concat(macro @:pos(expr.pos) new tink.testrunner.Assertion($a{args}));
 	}
 }
