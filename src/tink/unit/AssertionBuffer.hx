@@ -88,7 +88,7 @@ class AssertionBufferInjector {
 				);
 			}
 			
-			if(member.isPublic && isTest(member))
+			if(member.isPublic && !member.isStatic && isTest(member))
 				switch member.getFunction() {
 					case Success(func):
 						if(func.args.exists(function(a) return a.name == 'asserts'))

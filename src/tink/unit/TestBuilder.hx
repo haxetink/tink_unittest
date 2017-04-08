@@ -36,17 +36,9 @@ class TestBuilder {
 					
 					for(field in info.fields) {
 						var fname = field.field.name;
-						
-						function transformPos(p:Position) {
-							return if(POS_REGEX.match(Std.string(p))) {
-								lineNumber: Std.parseInt(POS_REGEX.matched(2)),
-								fileName: POS_REGEX.matched(1).split('/').pop(),
-								methodName: fname,
-								className: switch info.type {
-									case TInst(_.get() => {name: name}, _): name;
-									default: null;
-								}
-							} else null;
+						var cname = switch info.type {
+							case TInst(_.get() => {name: name}, _): name;
+							default: null;
 						}
 						
 						switch [field.kind, field.variants] {
@@ -57,7 +49,7 @@ class TestBuilder {
 									timeout: field.timeout,
 									exclude: field.exclude,
 									include: field.include,
-									pos: transformPos(field.field.pos),
+									pos: transformPos(field.field.pos, fname, cname),
 									runnable: macro @:pos(field.field.pos) function():tink.testrunner.Assertions return target.$fname($a{args}),
 								});
 								
@@ -70,7 +62,7 @@ class TestBuilder {
 										timeout: field.timeout,
 										exclude: field.exclude,
 										include: field.include,
-										pos: transformPos(field.field.pos),
+										pos: transformPos(field.field.pos, fname, cname),
 										runnable: macro @:pos(field.field.pos) function():tink.testrunner.Assertions return target.$fname($a{args}),
 									});
 								}
@@ -193,9 +185,18 @@ class TestBuilder {
 				var timeout = getTimeout(field.meta, clstimeout);
 				var variants = switch field.meta.extract(':variant') {
 					case []: [];
-					case v: [for(v in v) switch v.params {
-						case [{expr: ECall(e, params)}]: {description: '$description: ' + e.getString().sure(), args: params};
-						case p: {description: '$description: ' + [for(e in p) e.toString()].join(', '), args: p}
+					case v: [for(v in v) {
+						var desc, args;
+						switch v.params {
+							case [{expr: ECall(e, params)}]: 
+								desc = e.getString().sure();
+								args = params;
+							case p: 
+								desc = [for(e in p) e.toString()].join(', ');
+								args = p;
+						}
+						var pos = transformPos(v.pos);
+						{description: '$description: $desc [${pos.fileName}:${pos.lineNumber}]', args: args};
 					}];
 				}
 				
@@ -254,6 +255,15 @@ class TestBuilder {
 				}
 			case p: p[0].pos.error('Multiple @:timeout meta');
 		} 
+	
+	static function transformPos(p:Position, ?methodName:String, ?className:String) {
+		return if(POS_REGEX.match(Std.string(p))) {
+			lineNumber: Std.parseInt(POS_REGEX.matched(2)),
+			fileName: POS_REGEX.matched(1).split('/').pop(),
+			methodName: methodName,
+			className: className,
+		} else null;
+	}
 }
 
 private typedef TestInfo = {

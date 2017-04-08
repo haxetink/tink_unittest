@@ -11,7 +11,7 @@ using tink.MacroApi;
 class Assert {
 	static var printer = new haxe.macro.Printer();
 	
-	public static macro function assert(expr:ExprOf<Bool>, ?description:String):ExprOf<Assertion> {
+	public static macro function assert(expr:ExprOf<Bool>, ?description:String, ?pos:ExprOf<haxe.PosInfos>):ExprOf<Assertion> {
 		var pre = macro {};
 		var assertion = expr;
 		var desc = null;
@@ -40,6 +40,6 @@ class Assert {
 			}	
 		}
 		
-		return pre.concat(macro @:pos(expr.pos) new tink.testrunner.Assertion($assertion, $desc));
+		return pre.concat(macro @:pos(expr.pos) new tink.testrunner.Assertion($assertion, $desc, $pos));
 	}
 }
