@@ -184,9 +184,12 @@ class TestBuilder {
 					switch type {
 						case TFun(args, ret):
 							for(i in 0...args.length)
-								if(Context.unify(args[i].t, Context.getType('tink.unit.AssertionBuffer'))) {
-									bufferIndex = i;
-									break;
+								switch args[i].t {
+									case TDynamic(null): // ignore
+									case t if(Context.unify(t, Context.getType('tink.unit.AssertionBuffer'))):
+										bufferIndex = i;
+										break;
+									default:
 								}
 						case TLazy(f): prepareBuffer(f());
 						default:
