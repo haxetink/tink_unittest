@@ -8,8 +8,13 @@ using tink.CoreApi;
 
 abstract AssertionBuffer(Accumulator<Assertion, tink.core.Error>) to Assertions {
 	
-	public macro function assert(ethis:Expr, expr:ExprOf<Bool>, ?description:String):ExprOf<Assertion> {
-		return macro $ethis.emit(tink.unit.Assert.assert($expr, $v{description}));
+	public macro function assert(ethis:Expr, result:ExprOf<Bool>, ?description:ExprOf<String>, ?pos:ExprOf<haxe.PosInfos>):ExprOf<Assertion> {
+		var args = [result, description];
+		switch pos {
+			case macro null:
+			default: args.push(pos);
+		}
+		return macro $ethis.emit(tink.unit.Assert.assert($a{args}));
 	}
 		
 	#if !macro
