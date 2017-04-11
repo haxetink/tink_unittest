@@ -6,7 +6,7 @@ import haxe.macro.Expr;
 
 using tink.CoreApi;
 
-abstract AssertionBuffer(Accumulator<Assertion, tink.core.Error>) to Assertions {
+abstract AssertionBuffer(Accumulator<Assertion #if pure , tink.core.Error #end>) to Assertions {
 	
 	public macro function assert(ethis:Expr, result:ExprOf<Bool>, ?description:ExprOf<String>, ?pos:ExprOf<haxe.PosInfos>):ExprOf<Assertion> {
 		var args = [result, description];
