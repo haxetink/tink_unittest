@@ -30,9 +30,7 @@ class RunTests {
 		Runner.run(TestBatch.make([
 			new NormalTest(),
 			new AwaitTest(),
-		])).handle(function(result) {
-			exit(result.summary().failures.length);
-		});
+		])).handle(Runner.exit);
 	}
 }
 
