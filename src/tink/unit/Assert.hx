@@ -11,10 +11,23 @@ using tink.MacroApi;
 class Assert {
 	static var printer = new haxe.macro.Printer();
 	
+	#if macro
+	static var posInfos = Context.getType('haxe.PosInfos');
+	#end
+	
 	public static macro function assert(expr:ExprOf<Bool>, ?description:ExprOf<String>, ?pos:ExprOf<haxe.PosInfos>):ExprOf<Assertion> {
 		var pre = macro {};
 		var assertion = expr;
 		
+		switch description {
+			case macro null:
+			default:
+				if(Context.unify(Context.typeof(description), posInfos)) {
+					pos = description;
+					description = macro null;
+				}
+		}
+				
 		switch description {
 			case macro null:
 				description = macro $v{expr.toString()};
