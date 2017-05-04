@@ -7,8 +7,8 @@
     "kevinresol",
     "back2dos"
   ],
-  "releasenote": "Assert: Allow skipping description while specifying pos",
-  "version": "0.4.3",
+  "releasenote": "Support `this` in @:variant",
+  "version": "0.5.0",
   "url": "https://github.com/haxetink/tink_unittest/",
   "dependencies": {
     "tink_syntaxhub": "",
