@@ -194,19 +194,31 @@ class TestBuilder {
 				var timeout = getTimeout(field.meta, clstimeout);
 				var variants = switch field.meta.extract(':variant') {
 					case []: [];
-					case v: [for(v in v) {
-						var desc, args;
-						switch v.params {
-							case [{expr: ECall(e, params)}]: 
-								desc = e.getString().sure();
-								args = params;
-							case p: 
-								desc = [for(e in p) e.toString()].join(', ');
-								args = p;
-						}
+					case v: 
+						function subst(e:Expr)
+							return switch e {
+								case macro this.$field: 
+									macro @:pos(e.pos) (@:privateAccess this.target.$field);
+								case macro this: 
+									macro @:pos(e.pos) (@:privateAccess this.target);
+								default:
+									e.map(subst);
+							}
 						
-						{description: desc, pos: v.pos, args: args}
-					}];
+						var ret = [];
+						for(v in v) {
+							var desc, args;
+							switch v.params {
+								case [{expr: ECall(e, params)}]: 
+									desc = e.getString().sure();
+									args = params.map(subst);
+								case p: 
+									desc = [for(e in p) e.toString()].join(', ');
+									args = p.map(subst);
+							}
+							ret.push({description: desc, pos: v.pos, args: args});
+						}
+						ret;
 				}
 				
 				var exclude = field.meta.extract(':exclude').length > 0;
