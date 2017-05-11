@@ -6,14 +6,23 @@ import haxe.macro.Expr;
 
 using tink.CoreApi;
 
-typedef Impl =
 #if pure 
-{trigger:SignalTrigger<Yield<Assertion, Error>>, stream:Stream<Assertion, Error>}
+private class Impl extends SignalStream<Assertion, Error> {
+	var trigger:SignalTrigger<Yield<Assertion, Error>>;
+	public function new() {
+		trigger = Signal.trigger();
+		super(trigger.asSignal());
+	}
+	public inline function yield(data)
+		trigger.trigger(data);
+}
 #else
-tink.streams.Accumulator<Assertion>
-#end ;
+private typedef Impl = tink.streams.Accumulator<Assertion>;
+#end
 
-abstract AssertionBuffer(Impl) {
+
+
+abstract AssertionBuffer(Impl) to Assertions {
 	
 	public macro function assert(ethis:Expr, result:ExprOf<Bool>, ?description:ExprOf<String>, ?pos:ExprOf<haxe.PosInfos>):ExprOf<Assertion> {
 		var args = [result, description];
@@ -25,47 +34,22 @@ abstract AssertionBuffer(Impl) {
 	}
 		
 	#if !macro
-	public inline function new() {
-		#if pure 
-		var trigger = Signal.trigger();
-		this = {
-			trigger: trigger,
-			stream: new SignalStream(trigger.asSignal()),
-		}
-		#else
-		this = new tink.streams.Accumulator();
-		#end
-	}
-	
-	inline function yield(data)
-		#if pure
-		this.trigger.trigger(data);
-		#else
-		this.yield(data);
-		#end
+	public inline function new()
+		this = new Impl();
 		
 	public inline function emit(assertion:Assertion)
-		yield(Data(assertion));
+		this.yield(Data(assertion));
 		
 	public inline function fail(?code:Int, reason:FailingReason, ?pos:haxe.PosInfos) {
 		if(code == null) code = reason.code;
-		yield(Fail(new Error(code, reason.message, pos)));
-		return toAssertions();
+		this.yield(Fail(new Error(code, reason.message, pos)));
+		return this;
 	}
 	
 	public inline function done():Assertions {
-		yield(End);
-		return toAssertions();
+		this.yield(End);
+		return this;
 	}
-	
-	@:to
-	public inline function toAssertions():Assertions
-		return 
-			#if pure
-			this.stream;
-			#else
-			this;
-			#end
 	#end
 }
 
