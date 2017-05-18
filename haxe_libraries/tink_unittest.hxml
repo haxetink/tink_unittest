@@ -1,0 +1,7 @@
+-D tink_unittest
+-cp src
+
+-lib tink_testrunner
+-lib tink_syntaxhub
+
+--macro tink.unit.AssertionBufferInjector.use()
