@@ -118,7 +118,7 @@ There are multiple ways in doing so, the simplest way is to return a single `tin
 ##### Sync Assertions
 
 ```haxe
-return new Assertion(true, 'Some description);
+return new Assertion(true, 'Some description');
 // or
 return tink.unit.Assert.assert(true);
 ```
@@ -126,7 +126,7 @@ return tink.unit.Assert.assert(true);
 You can also return an `Array<Assertion>`
 
 ```haxe
-return [for(i in 0...10) new Assertion(true, 'Some description)];
+return [for(i in 0...10) new Assertion(true, 'Some description')];
 // or
 return [for(i in 0...10) tink.unit.Assert.assert(true)];
 ```
