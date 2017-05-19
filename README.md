@@ -13,10 +13,10 @@
 
 Supported metadata:
 
-- `@:startup`: Run once before all tests
+- `@:setup`: Run once before all tests
 - `@:before`: Run before each tests
 - `@:after`: Run after each tests
-- `@:shutdown`: Run once after all tests
+- `@:teardown`: Run once after all tests
 - `@:timeout(int)`: Set timeout (in ms), default: 5000 (you can also put this at class-level)
 - `@:describe(string)`: Set description of test, default: name of function
 - `@:variant(params)`: Add variants to a test (see example below)
@@ -45,8 +45,8 @@ class NormalTest {
 	
 	@:before public function before() return Noise;
 	@:after public function after() return Noise;
-	@:startup public function startup() return Noise;
-	@:shutdown public function shutdown() return Noise;
+	@:setup public function setup() return Noise;
+	@:teardown public function teardown() return Noise;
 	
 	@:describe('Sync test')
 	public function sync()
@@ -107,10 +107,10 @@ class AwaitTest {
 
 All public method without the following metadata is considered a test method:
 
-- `@:startup`
+- `@:setup`
 - `@:before`
 - `@:after`
-- `@:shutdown`
+- `@:teardown`
 
 Each test method should return a value that can be casted to `tink.testrunner.Assertions`.
 There are multiple ways in doing so, the simplest way is to return a single `tink.testrunner.Assertion`:
