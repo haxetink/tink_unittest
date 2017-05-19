@@ -1,5 +1,9 @@
 # Tink Unit Test Framework [![Build Status](https://travis-ci.org/haxetink/tink_unittest.svg?branch=master)](https://travis-ci.org/haxetink/tink_unittest)
 
+## Quick Look
+
+![Quick Look](https://haxetink.github.io/tink_unittest/images/quicklook.png)
+
 ## Usage
 
 1. Tag instance methods with metadata (see below)
