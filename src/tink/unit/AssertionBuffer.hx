@@ -50,6 +50,12 @@ abstract AssertionBuffer(Impl) to Assertions {
 		this.yield(End);
 		return this;
 	}
+	
+	public function handle<T>(outcome:Outcome<T, Error>)
+		switch outcome {
+			case Success(_): done();
+			case Failure(e): fail(e.code, e);
+		}
 	#end
 }
 
