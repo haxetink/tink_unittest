@@ -7,8 +7,8 @@
     "kevinresol",
     "back2dos"
   ],
-  "releasenote": "Fix java",
-  "version": "0.5.1",
+  "releasenote": "Rename startup->setup & shutdown->teardown",
+  "version": "0.5.2",
   "url": "https://github.com/haxetink/tink_unittest/",
   "dependencies": {
     "tink_syntaxhub": "",
