@@ -19,6 +19,8 @@ Supported metadata:
 - `@:include`: Only run tests tagged with `@:include`
 - `@:exclude`: Exclude this test
 
+### Basic Example
+
 ```haxe
 import tink.testrunner.Runner;
 import tink.unit.Assert.assert;
@@ -109,6 +111,8 @@ All public method without the following metadata is considered a test method:
 Each test method should return a value that can be casted to `tink.testrunner.Assertions`.
 There are multiple ways in doing so, the simplest way is to return a single `tink.testrunner.Assertion`:
 
+##### Sync Assertions
+
 ```haxe
 return new Assertion(true, 'Some description);
 // or
@@ -123,7 +127,11 @@ return [for(i in 0...10) new Assertion(true, 'Some description)];
 return [for(i in 0...10) tink.unit.Assert.assert(true)];
 ```
 
-You can also use an `AssertionBuffer`
+##### Async Assertions
+
+You can use the Future/Promise variants of Assertion/Assertions
+
+You can also use `AssertionBuffer`, which can emit Assertion over time and in async operations:
 
 ```haxe
 var asserts = new AssertionBuffer();
