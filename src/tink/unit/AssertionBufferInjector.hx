@@ -46,8 +46,10 @@ class AssertionBufferInjector {
 			function isTest(member:Member) {
 				var meta = member.asField().meta;
 				return !meta.exists(function(m) return 
-					m.name == ':startup' || 
-					m.name == ':shutdown' || 
+					m.name == ':setup' || 
+					m.name == ':startup' || // TODO: deprecated
+					m.name == ':teardown' || 
+					m.name == ':shutdown' || // TODO: deprecated
 					m.name == ':before' || 
 					m.name == ':after' ||
 					m.name == ':exclude' 

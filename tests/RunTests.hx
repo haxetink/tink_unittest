@@ -102,10 +102,10 @@ class NormalTest {
 	@:before public function before2() return debug('b2');
 	@:after public function after() return debug('a');
 	@:after public function after2() return debug('a2');
-	@:startup public function startup() return debug('s');
-	@:startup public function startup2() return debug('s2');
-	@:shutdown public function shutdown() return debug('d');
-	@:shutdown public function shutdown2() return debug('d2');
+	@:setup public function setup() return debug('s');
+	@:setup public function setup2() return debug('s2');
+	@:teardown public function teardown() return debug('d');
+	@:teardown public function teardown2() return debug('d2');
 		
 	@:describe("Sync test")
 	public function sync() {
@@ -188,10 +188,10 @@ class AwaitTest {
 	@:before public function before2() return debug('b2');
 	@:after public function after() return debug('a');
 	@:after public function after2() return debug('a2');
-	@:startup public function startup() return debug('s');
-	@:startup public function startup2() return debug('s2');
-	@:shutdown public function shutdown() return debug('d');
-	@:shutdown public function shutdown2() return debug('d2');
+	@:setup public function setup() return debug('s');
+	@:setup public function setup2() return debug('s2');
+	@:teardown public function teardown() return debug('d');
+	@:teardown public function teardown2() return debug('d2');
 	
 	@:describe('Async test powered by tink_await')
 	@:async public function async() {
@@ -220,10 +220,10 @@ class IncludeTest {
 	@:before public function before2() return debug('b2');
 	@:after public function after() return debug('a');
 	@:after public function after2() return debug('a2');
-	@:startup public function startup() return debug('s');
-	@:startup public function startup2() return debug('s2');
-	@:shutdown public function shutdown() return debug('d');
-	@:shutdown public function shutdown2() return debug('d2');
+	@:setup public function setup() return debug('s');
+	@:setup public function setup2() return debug('s2');
+	@:teardown public function teardown() return debug('d');
+	@:teardown public function teardown2() return debug('d2');
 		
 	@:include
 	public function include() {
@@ -254,10 +254,10 @@ class ExcludeTest {
 	@:before public function before2() return debug('b2');
 	@:after public function after() return debug('a');
 	@:after public function after2() return debug('a2');
-	@:startup public function startup() return debug('s');
-	@:startup public function startup2() return debug('s2');
-	@:shutdown public function shutdown() return debug('d');
-	@:shutdown public function shutdown2() return debug('d2');
+	@:setup public function setup() return debug('s');
+	@:setup public function setup2() return debug('s2');
+	@:teardown public function teardown() return debug('d');
+	@:teardown public function teardown2() return debug('d2');
 		
 	@:exclude
 	public function exclude() {
@@ -282,10 +282,10 @@ class GrandParentTest {
 		result += msg;
 		return Noise;
 	}
-	@:startup public function startup() return debug('s');
-	@:startup public function startup2() return debug('s2');
-	@:shutdown public function shutdown() return debug('d');
-	@:shutdown public function shutdown2() return debug('d2');
+	@:setup public function setup() return debug('s');
+	@:setup public function setup2() return debug('s2');
+	@:teardown public function teardown() return debug('d');
+	@:teardown public function teardown2() return debug('d2');
 		
 	
 	public function grandParent() {

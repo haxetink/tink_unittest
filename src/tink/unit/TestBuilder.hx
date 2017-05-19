@@ -28,8 +28,8 @@ class TestBuilder {
 					var fields = [];
 					var includeMode = false;
 					var runnables = [
-						Startup => [],
-						Shutdown => [],
+						Setup => [],
+						Teardown => [],
 						Before => [],
 						After => [],
 					];
@@ -129,10 +129,10 @@ class TestBuilder {
 							this.target = target;
 						}
 						
-						override function startup() return ${makeServiceLoop(runnables[Startup])};
+						override function setup() return ${makeServiceLoop(runnables[Setup])};
 						override function before() return ${makeServiceLoop(runnables[Before])};
 						override function after() return ${makeServiceLoop(runnables[After])};
-						override function shutdown() return ${makeServiceLoop(runnables[Shutdown])};
+						override function teardown() return ${makeServiceLoop(runnables[Teardown])};
 					}
 					def.fields = def.fields.concat(fields); 
 					def.pack = ['tink', 'unit'];
@@ -176,13 +176,21 @@ class TestBuilder {
 				var fname = field.name;
 				
 				var kind:Kind = null;
-				function checkKind(meta:String, k:Kind) switch field.meta.extract(meta) {
+				function checkKind(meta:String, k:Kind, ?alt:String) switch field.meta.extract(meta) {
 					case []: // ok
-					case v if(kind == null): kind = k;
-					case v: v[0].pos.error('Cannot declare @$meta and @:${Std.string(kind).toLowerCase()} on the same function');
+					case v if(kind == null):
+						kind = k;
+						if(alt != null) Context.warning('@$meta is depcreated, use @$alt instead', v[0].pos);
+					case v if(kind == k): 
+						// duplicate, but ok
+						if(alt != null) Context.warning('@$meta is depcreated, use @$alt instead', v[0].pos);
+					case v:
+						v[0].pos.error('Cannot declare @$meta and @:${Std.string(kind).toLowerCase()} on the same function');
 				}
-				checkKind(':startup', Startup);
-				checkKind(':shutdown', Shutdown);
+				checkKind(':setup', Setup);
+				checkKind(':startup', Setup, ':setup');
+				checkKind(':teardown', Teardown);
+				checkKind(':shutdown', Teardown, ':teardown');
 				checkKind(':before', Before);
 				checkKind(':after', After);
 				if(kind == null) kind = Test;
@@ -304,8 +312,8 @@ private typedef TestInfo = {
 }
 
 private enum Kind {
-	Startup;
-	Shutdown;
+	Setup;
+	Teardown;
 	Before;
 	After;
 	Test;
