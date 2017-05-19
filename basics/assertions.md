@@ -1,23 +1,18 @@
 # Assertions
 
+In addition to the ways to construct an assertion as [mentioned](https://haxetink.github.io/tink_testrunner/#/basics/assertion) in `tink_testrunner`, `tink_unittest` provided a handy function ease the process.
+
 ## Macro solution
 
 By using `tink.unit.Assert.assert` to create an `Assertion`, 
 the description will be automatically filled by the stringified input expression.
 
-## Basic Assertion
-
-An assertion is described the `Assertion` class. To create an assertion:
-
 ```haxe
-new Assertion(true, 'A passed assertion');
-new Assertion(false, 'A failed assertion');
-new Assertion(Failure('fail reason'), 'A failed assertion with reason');
+tink.unit.Assert.assert(value == 1);
 ```
 
-## Multiple Assertions
+will be transformed to:
 
-A test should always return am `Assertions`, which is essentially `Stream<Assertion>`.
-There are multiple implicit casts in place to ease the writing of a test.
-Basically one can return a single Assertion, an array of Assertions or the Future/Promise version of them. 
-
+```haxe
+new Assertion(value == 1, 'value == 1');
+```
