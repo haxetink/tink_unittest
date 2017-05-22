@@ -1,19 +1,25 @@
 # Async Tests
 
-In addition to the ways [mentioned](https://haxetink.github.io/tink_testrunner/#/basics/async-tests) in `tink_testrunner`, `tink_unittest` provides a helper class for
-multiple and async assertions.
+In addition to the ways [mentioned](https://haxetink.github.io/tink_testrunner/#/basics/async-tests) in `tink_testrunner`, `tink_unittest` provides a helper class `AssertionBuffer` for multiple and async assertions.
 
 
 ## Assertion Buffer
 
-The other way is to use the provided `AssertionBuffer` class:
-
 ```haxe
-public function test() {
+public function multiAsserts() {
 	var asserts = new AssertionBuffer();
 	asserts.assert(true);
 	asserts.assert(true);
 	return asserts.done();
+}
+
+public function async() {
+	var asserts = new AssertionBuffer();
+	var asyncTask().handle(function(o) {
+		asserts.assert(o == 'async');
+		asserts.done();
+	});
+	return asserts;
 }
 ```
 
@@ -31,25 +37,6 @@ class MyClass {
 	}
 }
 ```
-
-## Assertion Buffer
-
-One can also use an [`AssertionBuffer`](basics/multi-assertions.md#assertion-buffer):
-
-```haxe
-public function async() {
-	var asserts = new AssertionBuffer();
-	var asyncTask().handle(function(o) {
-		asserts.assert(o == 'async');
-		asserts.done();
-	});
-	return asserts;
-}
-```
-
-When using an `AssertionBuffer`, remember to call `done()` on it when the tests are done,
-otherwise the tests will never finish and causes a [timeout](https://haxetink.github.io/tink_testrunner/#/basics/async-tests?id=timeout).
-
 
 ## Timeout
 

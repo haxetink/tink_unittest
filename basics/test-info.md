@@ -2,7 +2,8 @@
 
 ## Test Description
 
-Tag test method with `@:describe`
+By default, the test method name will be used as the test description.
+One can override the behavior by tagging the test method with `@:describe`
 
 ```haxe
 @:describe('Awesomeness should be awesome')

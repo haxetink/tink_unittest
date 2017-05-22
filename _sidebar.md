@@ -1,20 +1,14 @@
-- **Getting started**
-  - [Quick start](getting-started/quick-start.md)
-  
-- **Basics**
-  - [Routing](basics/routing.md)
-  - [Parameters](basics/parameters.md)
-  - [Request Body](basics/request-body.md)
-  - [Response](basics/response.md)
 
-- **Advanced**
-  - [Access Control](advanced/access-control.md)
-  - [Middleware](advanced/middleware.md)
-  - [Remoting](advanced/remoting.md)
-  
-- **API Reference**
-  - [Router](api-reference/router.md)
-  - [Context](api-reference/context.md)
+- **Getting Started**
+  - [Quick Start](getting-started/quick-start.md)
+
+- **Basics**
+  - [Assertion](basics/assertion.md)
+  - [Multiple Assertions](basics/multi-assertions.md)
+  - [Async Tests](basics/async-tests.md)
+  - [Setup / Teardown](basics/setup-teardown.md)
+  - [Include / Exclude](basics/include-exclude.md)
+  - [Test Info](basics/test-info.md)
   
 - **Miscellaneous**
   - [More Tinkerbell Libraries](https://haxetink.github.io)
