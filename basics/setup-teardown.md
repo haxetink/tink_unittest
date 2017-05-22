@@ -1,6 +1,6 @@
 # Setup / Teardown
 
-the following metadata can be used:
+The following metadata can be used:
 
 - `@:setup`: Run once before all tests
 - `@:before`: Run before each tests
