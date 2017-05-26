@@ -112,8 +112,9 @@ class TestBuilder {
 					}
 					
 					function makeServiceLoop(f:Array<Expr>) {
+						if(f.length == 0) return macro tink.core.Promise.NOISE;
 						var fields = f.copy();
-						fields.reverse();
+						fields.reverse(); // because the call tree is inside-out
 						var expr = fields.fold(function(f, expr) return macro $f().handle(function(o) switch o {
 							case Success(_): $expr;
 							case Failure(e): cb(tink.core.Outcome.Failure(e));
