@@ -7,6 +7,7 @@ import haxe.macro.Expr;
 using Lambda;
 using tink.CoreApi;
 #if macro
+import tink.macro.BuildCache;
 using tink.MacroApi;
 #end
 
@@ -18,133 +19,125 @@ class TestBuilder {
 	static var POS_REGEX = ~/#pos([^:]*):([^:]*).*/;
 	
 	public static function build() {
-		switch Context.getLocalType() {
-			case TInst(_, [type]): 
-				if(!cache.exists(type)) {
-					
-					var info = process(type);
-					var clsname = 'Suite_' + counter++;
-					var cases = [];
-					var fields = [];
-					var includeMode = false;
-					var runnables = [
-						Setup => [],
-						Teardown => [],
-						Before => [],
-						After => [],
-					];
-					
-					for(field in info.fields) {
-						var fname = field.field.name;
-						var cname = switch info.type {
-							case TInst(_.get() => {name: name}, _): name;
-							default: null;
-						}
-						
-						switch [field.kind, field.variants] {
-							case [Test, []]:
-								var args = field.bufferIndex == -1 ? [] : [macro new tink.unit.AssertionBuffer()];
-								cases.push({
-									name: field.description,
-									description: null,
-									timeout: field.timeout,
-									exclude: field.exclude,
-									include: field.include,
-									pos: transformPos(field.field.pos, fname, cname),
-									runnable: macro @:pos(field.field.pos) function():tink.testrunner.Assertions return target.$fname($a{args}),
-								});
-								
-							case [Test, variants]:
-								for(v in variants) {
-									var args = v.args.copy();
-									if(field.bufferIndex != -1) args.insert(field.bufferIndex, macro new tink.unit.AssertionBuffer());
-									cases.push({
-										name: field.description,
-										description: v.description,
-										timeout: field.timeout,
-										exclude: field.exclude,
-										include: field.include,
-										pos: transformPos(v.pos, fname, cname),
-										runnable: macro @:pos(field.field.pos) function():tink.testrunner.Assertions return target.$fname($a{args}),
-									});
-								}
-							
-							default:
-								var name = 'run_$fname';
-								fields.push({
-									name: name,
-									access: [APublic],
-									kind: FFun({
-										args: [],
-										ret: macro:tink.core.Promise<tink.core.Noise>,
-										expr: macro return target.$fname(),
-									}),
-									pos: field.field.pos,
-								});
-								runnables[field.kind].push(macro $i{name});
-						}
-					}
-					
-					cases = cases.filter(function(c) return !c.exclude && (!includeMode || c.include));
-					var tinkCases = [];
-					for(i in 0...cases.length) {
-						var caze = cases[i];
-						if(!includeMode && caze.include) includeMode = true;
-						var info = macro {
-							name: $v{caze.name},
-							description: $v{caze.description},
-							pos: {
-								lineNumber: $v{caze.pos.lineNumber},
-								fileName: $v{caze.pos.fileName},
-								methodName: $v{caze.pos.methodName},
-								className: $v{caze.pos.className},
-							}
-						}
-						tinkCases.push(macro {
-							var pos = {
-								lineNumber: $v{caze.pos.lineNumber},
-								fileName: $v{caze.pos.fileName},
-								methodName: $v{caze.pos.methodName},
-								className: $v{caze.pos.className},
-							}
-							new tink.unit.TestCase($info, ${caze.runnable}, $v{caze.timeout}, $v{caze.include}, $v{caze.exclude}, pos);
-						});
-					}
-					
-					function makeServiceLoop(f:Array<Expr>) {
-						if(f.length == 0) return macro tink.core.Promise.NOISE;
-						var fields = f.copy();
-						fields.reverse(); // because the call tree is inside-out
-						var expr = fields.fold(function(f, expr) return macro $f().handle(function(o) switch o {
-							case Success(_): $expr;
-							case Failure(e): cb(tink.core.Outcome.Failure(e));
-						}), macro cb(tink.core.Outcome.Success(tink.core.Noise.Noise.Noise)));
-						return macro tink.core.Future.async(function(cb) $expr);
-					}
-					
-					var ct = type.toComplex();
-					var def = macro class $clsname extends tink.unit.TestSuite.TestSuiteBase<$ct> {
-						
-						public function new(target:$ct, ?name:String) {
-							super({name: name == null ? $v{info.name} : name} , $a{tinkCases});
-							this.target = target;
-						}
-						
-						override function setup() return ${makeServiceLoop(runnables[Setup])};
-						override function before() return ${makeServiceLoop(runnables[Before])};
-						override function after() return ${makeServiceLoop(runnables[After])};
-						override function teardown() return ${makeServiceLoop(runnables[Teardown])};
-					}
-					def.fields = def.fields.concat(fields); 
-					def.pack = ['tink', 'unit'];
-					
-					Context.defineType(def);
-					cache.set(type, TPath('tink.unit.$clsname'.asTypePath()));
+		return BuildCache.getType('tink.unit.TestSuiteBuilder', function(ctx) {
+			var type = ctx.type;
+			var clsname = ctx.name;
+			var info = process(type);
+			var cases = [];
+			var fields = [];
+			var includeMode = false;
+			var runnables = [
+				Setup => [],
+				Teardown => [],
+				Before => [],
+				After => [],
+			];
+			
+			for(field in info.fields) {
+				var fname = field.field.name;
+				var cname = switch info.type {
+					case TInst(_.get() => {name: name}, _): name;
+					default: null;
 				}
-				return cache.get(type);
 				
-			default: throw 'assert';
-		}
+				switch [field.kind, field.variants] {
+					case [Test, []]:
+						var args = field.bufferIndex == -1 ? [] : [macro new tink.unit.AssertionBuffer()];
+						cases.push({
+							name: field.description,
+							description: null,
+							timeout: field.timeout,
+							exclude: field.exclude,
+							include: field.include,
+							pos: transformPos(field.field.pos, fname, cname),
+							runnable: macro @:pos(field.field.pos) function():tink.testrunner.Assertions return target.$fname($a{args}),
+						});
+						
+					case [Test, variants]:
+						for(v in variants) {
+							var args = v.args.copy();
+							if(field.bufferIndex != -1) args.insert(field.bufferIndex, macro new tink.unit.AssertionBuffer());
+							cases.push({
+								name: field.description,
+								description: v.description,
+								timeout: field.timeout,
+								exclude: field.exclude,
+								include: field.include,
+								pos: transformPos(v.pos, fname, cname),
+								runnable: macro @:pos(field.field.pos) function():tink.testrunner.Assertions return target.$fname($a{args}),
+							});
+						}
+					
+					default:
+						var name = 'run_$fname';
+						fields.push({
+							name: name,
+							access: [APublic],
+							kind: FFun({
+								args: [],
+								ret: macro:tink.core.Promise<tink.core.Noise>,
+								expr: macro return target.$fname(),
+							}),
+							pos: field.field.pos,
+						});
+						runnables[field.kind].push(macro $i{name});
+				}
+			}
+			
+			cases = cases.filter(function(c) return !c.exclude && (!includeMode || c.include));
+			var tinkCases = [];
+			for(i in 0...cases.length) {
+				var caze = cases[i];
+				if(!includeMode && caze.include) includeMode = true;
+				var info = macro {
+					name: $v{caze.name},
+					description: $v{caze.description},
+					pos: {
+						lineNumber: $v{caze.pos.lineNumber},
+						fileName: $v{caze.pos.fileName},
+						methodName: $v{caze.pos.methodName},
+						className: $v{caze.pos.className},
+					}
+				}
+				tinkCases.push(macro {
+					var pos = {
+						lineNumber: $v{caze.pos.lineNumber},
+						fileName: $v{caze.pos.fileName},
+						methodName: $v{caze.pos.methodName},
+						className: $v{caze.pos.className},
+					}
+					new tink.unit.TestCase($info, ${caze.runnable}, $v{caze.timeout}, $v{caze.include}, $v{caze.exclude}, pos);
+				});
+			}
+			
+			function makeServiceLoop(f:Array<Expr>) {
+				if(f.length == 0) return macro tink.core.Promise.NOISE;
+				var fields = f.copy();
+				fields.reverse(); // because the call tree is inside-out
+				var expr = fields.fold(function(f, expr) return macro $f().handle(function(o) switch o {
+					case Success(_): $expr;
+					case Failure(e): cb(tink.core.Outcome.Failure(e));
+				}), macro cb(tink.core.Outcome.Success(tink.core.Noise.Noise.Noise)));
+				return macro tink.core.Future.async(function(cb) $expr);
+			}
+			
+			var ct = type.toComplex();
+			var def = macro class $clsname extends tink.unit.TestSuite.TestSuiteBase<$ct> {
+				
+				public function new(target:$ct, ?name:String) {
+					super({name: name == null ? $v{info.name} : name} , $a{tinkCases});
+					this.target = target;
+				}
+				
+				override function setup() return ${makeServiceLoop(runnables[Setup])};
+				override function before() return ${makeServiceLoop(runnables[Before])};
+				override function after() return ${makeServiceLoop(runnables[After])};
+				override function teardown() return ${makeServiceLoop(runnables[Teardown])};
+			}
+			def.fields = def.fields.concat(fields); 
+			def.pack = ['tink', 'unit'];
+			return def;
+		});
 	}
 	
 	static function process(type:Type):TestInfo {
