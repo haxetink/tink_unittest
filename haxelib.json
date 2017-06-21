@@ -1,17 +1,17 @@
 {
-  "name": "tink_unittest",
-  "license": "MIT",
-  "tags": [],
-  "classPath": "src",
-  "contributors": [
-    "kevinresol",
-    "back2dos"
-  ],
-  "releasenote": "Rename startup->setup & shutdown->teardown",
-  "version": "0.5.2",
-  "url": "https://github.com/haxetink/tink_unittest/",
-  "dependencies": {
-    "tink_syntaxhub": "",
-    "tink_testrunner": ""
-  }
+	"name": "tink_unittest",
+	"license": "MIT",
+	"tags": [],
+	"classPath": "src",
+	"contributors": [
+		"kevinresol",
+		"back2dos"
+	],
+	"releasenote": "Various tweaks",
+	"version": "0.5.3",
+	"url": "https://github.com/haxetink/tink_unittest/",
+	"dependencies": {
+		"tink_testrunner": "",
+		"tink_syntaxhub": ""
+	}
 }
