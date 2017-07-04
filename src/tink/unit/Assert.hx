@@ -1,6 +1,8 @@
 package tink.unit;
 
 import tink.testrunner.Assertion;
+import tink.testrunner.Assertions;
+import tink.streams.Stream;
 import haxe.macro.Expr;
 import haxe.macro.Context;
 
@@ -57,6 +59,9 @@ class Assert {
 	}
 	
 	#if !macro
+	public static function fail(e:tink.core.Error, ?pos:haxe.PosInfos):Assertions
+		return Stream.ofError(e);
+	
 	public static function stringify(v:Dynamic) {
 		return 
 			if(Std.is(v, String) || Std.is(v, Float) || Std.is(v, Bool)) haxe.Json.stringify(v);
