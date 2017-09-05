@@ -7,8 +7,8 @@
 		"kevinresol",
 		"back2dos"
 	],
-	"releasenote": "Various tweaks",
-	"version": "0.5.3",
+	"releasenote": "Add Assert.fail and fix for ES6",
+	"version": "0.5.4",
 	"url": "https://github.com/haxetink/tink_unittest/",
 	"dependencies": {
 		"tink_testrunner": "",
