@@ -60,7 +60,7 @@ class Assert {
 	
 	#if !macro
 	public static function fail(e:tink.core.Error, ?pos:haxe.PosInfos):Assertions
-		return Stream.ofError(e);
+		return #if pure Stream.ofError(e) #else Stream.failure(e) #end;
 	
 	public static function stringify(v:Dynamic) {
 		return 
