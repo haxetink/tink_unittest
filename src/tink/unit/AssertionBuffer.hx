@@ -10,8 +10,9 @@ using tink.CoreApi;
 private class Impl extends SignalStream<Assertion, Error> {
 	var trigger:SignalTrigger<Yield<Assertion, Error>>;
 	public function new() {
-		trigger = Signal.trigger();
+		var trigger = Signal.trigger();
 		super(trigger.asSignal());
+		this.trigger = trigger;
 	}
 	public inline function yield(data)
 		trigger.trigger(data);
