@@ -31,7 +31,7 @@ abstract AssertionBuffer(Impl) to Assertions {
 			case macro null:
 			default: args.push(pos);
 		}
-		return macro $ethis.emit(tink.unit.Assert.assert($a{args}));
+		return macro @:pos(ethis.pos) $ethis.emit(tink.unit.Assert.assert($a{args}));
 	}
 		
 	#if !macro
