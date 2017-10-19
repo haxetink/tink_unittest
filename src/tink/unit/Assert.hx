@@ -35,7 +35,7 @@ class Assert {
 					case EBinop(op, e1, e2):
 						
 						var operator = printer.printBinop(op);
-						var operation = EBinop(op, macro lh, macro rh).at(expr.pos);
+						var operation = EBinop(op, macro @:pos(e1.pos) lh, macro @:pos(e2.pos) rh).at(expr.pos);
 						
 						pre = macro {
 							// store the values to avoid evaluating the expressions twice
