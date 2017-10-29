@@ -16,7 +16,6 @@ class TestBuilder {
 	static var cache = new TypeMap();
 	static var infos = new TypeMap();
 	static var counter = 0;
-	static var POS_REGEX = ~/#pos([^:]*):([^:]*).*/;
 	
 	public static function build() {
 		return BuildCache.getType('tink.unit.TestSuiteBuilder', function(ctx) {
@@ -279,14 +278,21 @@ class TestBuilder {
 			case p: p[0].pos.error('Multiple @:timeout meta');
 		} 
 	
-	static function transformPos(p:Position, ?methodName:String, ?className:String) {
-		return if(POS_REGEX.match(Std.string(p))) {
-			lineNumber: Std.parseInt(POS_REGEX.matched(2)),
-			fileName: POS_REGEX.matched(1).split('/').pop(),
-			methodName: methodName,
-			className: className,
-		} else null;
-	}
+	static function transformPos(p:Position, ?methodName:String, ?className:String):haxe.PosInfos 
+		return 
+			switch Context.getTypedExpr(Context.typeExpr(macro @:pos(p) (function (?pos:haxe.PosInfos) return pos.lineNumber)())) {
+				case macro $_({ fileName: $f, lineNumber: $l, className: $c, methodName: $m }):
+					function get(s:String, e:Expr) 
+						return if (s == null) e.getString().sure() else s;
+					{ 
+						fileName: f.getString().sure(), 
+						lineNumber: l.getInt().sure(), 
+						className: get(className, c),
+						methodName: get(methodName, m),
+					}
+				default: null;
+			}
+
 }
 
 private typedef TestInfo = {
