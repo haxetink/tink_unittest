@@ -1,17 +1,17 @@
 {
 	"name": "tink_unittest",
-	"license": "MIT",
-	"tags": [],
 	"classPath": "src",
+	"dependencies": {
+		"tink_syntaxhub": "",
+		"tink_testrunner": ""
+	},
+	"url": "https://github.com/haxetink/tink_unittest/",
 	"contributors": [
 		"kevinresol",
 		"back2dos"
 	],
-	"releasenote": "Add Assert.fail and fix for ES6",
-	"version": "0.5.4",
-	"url": "https://github.com/haxetink/tink_unittest/",
-	"dependencies": {
-		"tink_testrunner": "",
-		"tink_syntaxhub": ""
-	}
+	"version": "0.5.5",
+	"releasenote": "Fix some macro positions",
+	"tags": [],
+	"license": "MIT"
 }
