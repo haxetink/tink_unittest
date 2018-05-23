@@ -5,8 +5,7 @@
   "scripts": {
     "haxelib": "haxelib",
     "haxe": "haxe",
-    "travix": "neko travix.n",
-    "postinstall": "lix download && haxe -lib travix -main travix.Travix -neko travix.n && npm install -g switchx && switchx"
+    "postinstall": "lix download"
   },
   "dependencies": {},
   "devDependencies": {

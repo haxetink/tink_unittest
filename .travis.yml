@@ -15,21 +15,21 @@ env:
   - secure: eft/zq63mlE8D4PbutphuJwOHmORi7Hf4lCGax/7wy60OeAd2YQc67fsN5iz4BhWFTzSohJamNdOgPYp3/bJcpclw8fCQhn8xTMlcvZpBAx8R7e5gDx/JCBf1O+Rswi9wIgOkJBnXK1JEZyIk7wqGHhQfEK4fPZibWxubXGg+Hj4vl/s9iWoH/yX7feBCEX1NNRJLrcCo0W1RYHhjlWdf07pjjsCnclgvVGCoJgX6q03VLsxgjrdQ/H11DSYSkZg9C7ipBbfxVL3NEm2nYjY5k7Vfb3uM3tCYKM+SCO7KAWNjZ/IOS5JVatIKDcacbBNgU0RDrJFEU4Ri7UwBzSBWfV675MR5FZy2RJJznIMHMKxcuIkip8Es3TO8HdCiwSdsjSCozrIEZyg3SvovSD4TpYQpAR/0I80sOznZR0KHO26V9+F0SUxCa6ZpCv0GctL0zdypqujOqLYbVy/NqE0foj5SNeXLBVaIGfCoBuzvYyVGWIy28Q2itdo0IObH4pf1ClQkMhFX5XYlyAB7kMNMss0oTYc2HN2SA6E1S44cP5yNxX2AEr2l2LEzWhavgGwTYe3RfqGG/EWCrE6535zuAqTB6kcesrAmIkJ7EXxfxsxkQup6hRnsbDdr52nUitzyc8u0xR1IXePxoh+yoJ/8Mhj7VHlxX8TNlz8CfRidow=
     
 script:
-  - npm run --silent travix interp
-  - npm run --silent travix neko
-  - npm run --silent travix python
-  - npm run --silent travix node
-  - npm run --silent travix js
-  # - npm run --silent travix flash
-  - npm run --silent travix java
-  - npm run --silent travix cpp
-  - npm run --silent travix cs
-  - npm run --silent travix php
-  - npm run --silent travix lua
+  - haxelib run travix interp
+  - haxelib run travix neko
+  - haxelib run travix python
+  - haxelib run travix node
+  - haxelib run travix js
+  # - haxelib run travix flash
+  - haxelib run travix java
+  - haxelib run travix cpp
+  - haxelib run travix cs
+  - haxelib run travix php
+  - haxelib run travix lua
 
 jobs:
   include:
     - stage: deploy
       os: linux
       script: skip
-      after_success: npm run --silent travix release
+      after_success: haxelib run travix release
