@@ -9,23 +9,13 @@ os:
   - osx
       
 install:
-  - npm install
+  - npm install -g travlix
 
 env:
   - secure: eft/zq63mlE8D4PbutphuJwOHmORi7Hf4lCGax/7wy60OeAd2YQc67fsN5iz4BhWFTzSohJamNdOgPYp3/bJcpclw8fCQhn8xTMlcvZpBAx8R7e5gDx/JCBf1O+Rswi9wIgOkJBnXK1JEZyIk7wqGHhQfEK4fPZibWxubXGg+Hj4vl/s9iWoH/yX7feBCEX1NNRJLrcCo0W1RYHhjlWdf07pjjsCnclgvVGCoJgX6q03VLsxgjrdQ/H11DSYSkZg9C7ipBbfxVL3NEm2nYjY5k7Vfb3uM3tCYKM+SCO7KAWNjZ/IOS5JVatIKDcacbBNgU0RDrJFEU4Ri7UwBzSBWfV675MR5FZy2RJJznIMHMKxcuIkip8Es3TO8HdCiwSdsjSCozrIEZyg3SvovSD4TpYQpAR/0I80sOznZR0KHO26V9+F0SUxCa6ZpCv0GctL0zdypqujOqLYbVy/NqE0foj5SNeXLBVaIGfCoBuzvYyVGWIy28Q2itdo0IObH4pf1ClQkMhFX5XYlyAB7kMNMss0oTYc2HN2SA6E1S44cP5yNxX2AEr2l2LEzWhavgGwTYe3RfqGG/EWCrE6535zuAqTB6kcesrAmIkJ7EXxfxsxkQup6hRnsbDdr52nUitzyc8u0xR1IXePxoh+yoJ/8Mhj7VHlxX8TNlz8CfRidow=
     
 script:
-  - npx lix run travix interp
-  - npx lix run travix neko
-  - npx lix run travix python
-  - npx lix run travix node
-  - npx lix run travix js
-  # - npx lix run travix flash
-  - npx lix run travix java
-  - npx lix run travix cpp
-  - npx lix run travix cs
-  - npx lix run travix php
-  - npx lix run travix lua
+  - travlix run --haxe 3.4.7 --target interp,neko,python,node,js,java,cpp,cs,php,lua
 
 jobs:
   include:
