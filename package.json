@@ -3,9 +3,6 @@
   "version": "0.0.0",
   "description": "",
   "scripts": {
-    "haxelib": "haxelib",
-    "haxe": "haxe",
-    "travix": "haxelib run travix",
     "postinstall": "lix download"
   },
   "dependencies": {},
