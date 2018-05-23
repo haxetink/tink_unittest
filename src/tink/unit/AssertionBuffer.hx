@@ -41,15 +41,15 @@ abstract AssertionBuffer(Impl) to Assertions {
 	public inline function emit(assertion:Assertion)
 		this.yield(Data(assertion));
 		
-	public inline function fail(?code:Int, reason:FailingReason, ?pos:haxe.PosInfos):Assertions {
+	public inline function fail(?code:Int, reason:FailingReason, ?pos:haxe.PosInfos):AssertionBuffer {
 		if(code == null) code = reason.code;
 		this.yield(Fail(new Error(code, reason.message, pos)));
-		return this;
+		return cast this;
 	}
 	
-	public inline function done():Assertions {
+	public inline function done():AssertionBuffer {
 		this.yield(End);
-		return this;
+		return cast this;
 	}
 	
 	public function handle<T>(outcome:Outcome<T, Error>)
