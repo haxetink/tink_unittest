@@ -1,7 +1,7 @@
-# @run: haxelib run-dir travix ${HAXE_LIBCACHE}/travix/0.11.2/github/0251b531c93b4a446bd4059198fe40e34ae445b5
-# @post-install: cd ${HAXE_LIBCACHE}/travix/0.11.2/github/0251b531c93b4a446bd4059198fe40e34ae445b5 && lix download && haxe build-neko.hxml
-# @install: lix --silent download "gh://github.com/back2dos/travix#0251b531c93b4a446bd4059198fe40e34ae445b5" into travix/0.11.2/github/0251b531c93b4a446bd4059198fe40e34ae445b5
--D travix=0.11.2
--cp ${HAXE_LIBCACHE}/travix/0.11.2/github/0251b531c93b4a446bd4059198fe40e34ae445b5/src
+# @run: haxelib run-dir travix ${HAXE_LIBCACHE}/travix/0.11.3/haxelib
+# @post-install: cd ${HAXE_LIBCACHE}/travix/0.11.3/haxelib && haxe -cp src --run travix.PostDownload
+# @install: lix --silent download "haxelib:travix#0.11.3" into travix/0.11.3/haxelib
+-D travix=0.11.3
+-cp ${HAXE_LIBCACHE}/travix/0.11.3/haxelib/src
 
 -lib tink_cli
