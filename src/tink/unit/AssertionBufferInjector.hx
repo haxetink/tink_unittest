@@ -51,8 +51,7 @@ class AssertionBufferInjector {
 					m.name == ':teardown' || 
 					m.name == ':shutdown' || // TODO: deprecated
 					m.name == ':before' || 
-					m.name == ':after' ||
-					m.name == ':exclude' 
+					m.name == ':after'
 				);
 			}
 			
