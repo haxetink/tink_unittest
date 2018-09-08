@@ -10,8 +10,8 @@
 		"kevinresol",
 		"back2dos"
 	],
-	"version": "0.5.5",
-	"releasenote": "Fix some macro positions",
+	"version": "0.5.6",
+	"releasenote": "Add details for `enum.match(pattern)`.",
 	"tags": [],
 	"license": "MIT"
 }
