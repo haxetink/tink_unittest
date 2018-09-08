@@ -1,35 +1,38 @@
 sudo: required
 dist: trusty
 
-language: node_js
-node_js: 8
-
-os:
-  - linux
-  - osx
-      
-install:
-  - yarn
-
 env:
   - secure: eft/zq63mlE8D4PbutphuJwOHmORi7Hf4lCGax/7wy60OeAd2YQc67fsN5iz4BhWFTzSohJamNdOgPYp3/bJcpclw8fCQhn8xTMlcvZpBAx8R7e5gDx/JCBf1O+Rswi9wIgOkJBnXK1JEZyIk7wqGHhQfEK4fPZibWxubXGg+Hj4vl/s9iWoH/yX7feBCEX1NNRJLrcCo0W1RYHhjlWdf07pjjsCnclgvVGCoJgX6q03VLsxgjrdQ/H11DSYSkZg9C7ipBbfxVL3NEm2nYjY5k7Vfb3uM3tCYKM+SCO7KAWNjZ/IOS5JVatIKDcacbBNgU0RDrJFEU4Ri7UwBzSBWfV675MR5FZy2RJJznIMHMKxcuIkip8Es3TO8HdCiwSdsjSCozrIEZyg3SvovSD4TpYQpAR/0I80sOznZR0KHO26V9+F0SUxCa6ZpCv0GctL0zdypqujOqLYbVy/NqE0foj5SNeXLBVaIGfCoBuzvYyVGWIy28Q2itdo0IObH4pf1ClQkMhFX5XYlyAB7kMNMss0oTYc2HN2SA6E1S44cP5yNxX2AEr2l2LEzWhavgGwTYe3RfqGG/EWCrE6535zuAqTB6kcesrAmIkJ7EXxfxsxkQup6hRnsbDdr52nUitzyc8u0xR1IXePxoh+yoJ/8Mhj7VHlxX8TNlz8CfRidow=
     
-script:
-  - yarn travix interp
-  - yarn travix neko
-  - yarn travix python
-  - yarn travix node
-  - yarn travix js
-  # - yarn travix flash
-  - yarn travix java
-  - yarn travix cpp
-  - yarn travix cs
-  - yarn travix php
-  - yarn travix lua
-
 jobs:
   include:
+    - stage: test
+      language: node_js
+      node_js: 8
+      os:
+        - linux
+        # - osx
+      install:
+        - npm i -g lix
+        - lix download
+      script:
+        - lix run travix interp
+        - lix run travix neko
+        - lix run travix python
+        - lix run travix node
+        - lix run travix js
+        # - lix run travix flash
+        - lix run travix java
+        - lix run travix cpp
+        - lix run travix cs
+        - lix run travix php
+        - lix run travix lua
     - stage: deploy
+      language: haxe
+      haxe: "3.4.7"
       os: linux
       script: skip
-      after_success: yarn travix release
+      after_success:
+        - haxelib install travix
+        - haxelib run travix install
+        - haxelib run travix release
