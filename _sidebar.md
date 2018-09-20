@@ -9,6 +9,7 @@
   - [Setup / Teardown](basics/setup-teardown.md)
   - [Include / Exclude](basics/include-exclude.md)
   - [Test Info](basics/test-info.md)
+  - [Parameterized Tests](basics/parameters.md)
   
 - **Miscellaneous**
   - [More Tinkerbell Libraries](https://haxetink.github.io)
