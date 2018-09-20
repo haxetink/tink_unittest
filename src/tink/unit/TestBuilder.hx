@@ -210,8 +210,8 @@ class TestBuilder {
 						for(v in v) {
 							var desc, args;
 							switch v.params {
-								case [{expr: ECall(e, params)}]: 
-									desc = e.getString().sure();
+								case [{expr: ECall({expr: EConst(CString(str))}, params)}]: 
+									desc = str;
 									args = params.map(subst);
 								case p: 
 									desc = [for(e in p) e.toString()].join(', ');

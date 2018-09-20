@@ -43,7 +43,7 @@ class RunTests {
 				child,
 			])).map(function(result) {
 				assertEquals(0, result.summary().failures.length);
-				assertEquals('ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2bb2variant1aa2bb2variant2aa2bb2variant3aa2dd2', normal.result);
+				assertEquals('ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2bb2variant1aa2bb2variant2aa2bb2variant3aa2bb2variant21aa2dd2', normal.result);
 				assertEquals('ss2bb2asyncaa2dd2', _await.result);
 				assertEquals('ss2bb2includeaa2dd2', exclude.result);
 				assertEquals('ss2grandParentdd2', grandParent.result);
@@ -169,6 +169,14 @@ class NormalTest {
 		debug('variant$a');
 		return assert(a == b);
 	}
+	
+	@:variant(this.int())
+	public function variant2(a:Int) {
+		debug('variant2$a');
+		return assert(a == a);
+	}
+	
+	function int() return 1;
 }
 
 @:await
