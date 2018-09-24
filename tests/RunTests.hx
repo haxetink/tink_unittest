@@ -85,7 +85,7 @@ class RunTests {
 
 @:asserts
 @:name('Custom Test Name')
-class NormalTest {
+class NormalTest extends tink.unit.Benchmark {
 	public var myInt = 3;
 	public var result:String;
 	
@@ -175,6 +175,11 @@ class NormalTest {
 		debug('variant2$a');
 		return assert(a == a);
 	}
+	
+	@:describe('Benchmark Math.sqrt()')
+	@:benchmark(10000)
+	public function benchmark()
+		for(i in 0...10000) Math.sqrt(i);
 	
 	function int() return 1;
 }
