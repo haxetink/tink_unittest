@@ -21,6 +21,7 @@ It transforms test classes into compatible instances to be run by the test `Runn
 - [Include / Exclude](basics/include-exclude.md)
 - [Test Info](basics/test-info.md)
 - [Parameterized Tests](basics/parameters.md)
+- [Benchmarking](basics/benchmarking.md)
 
 ## Code Demo
 

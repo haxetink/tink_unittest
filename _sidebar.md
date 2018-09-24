@@ -10,6 +10,7 @@
   - [Include / Exclude](basics/include-exclude.md)
   - [Test Info](basics/test-info.md)
   - [Parameterized Tests](basics/parameters.md)
+  - [Benchmarking](basics/benchmarking.md)
   
 - **Miscellaneous**
   - [More Tinkerbell Libraries](https://haxetink.github.io)
