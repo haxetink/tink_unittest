@@ -85,7 +85,7 @@ class RunTests {
 
 @:asserts
 @:name('Custom Test Name')
-class NormalTest extends tink.unit.Benchmark {
+class NormalTest implements tink.unit.Benchmark {
 	public var myInt = 3;
 	public var result:String;
 	

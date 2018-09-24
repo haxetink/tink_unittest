@@ -3,7 +3,7 @@ package tink.unit;
 #if !macro
 
 @:autoBuild(tink.unit.Benchmark.build())
-class Benchmark {}
+interface Benchmark {}
 
 #else
 
