@@ -20,7 +20,7 @@ class MyTest {
 		var start = haxe.Timer.stamp();
 		for(_ in 0...10000) for(i in 0...5000) Math.sqrt(i);
 		var dt = haxe.Timer.stamp() - start;
-		return tink.testrunner.Assertion(true, 'Benchmark: 10000 iterations = ${dt}s');
+		return new tink.testrunner.Assertion(true, 'Benchmark: 10000 iterations = ${dt}s');
 	}
 }
 ```
