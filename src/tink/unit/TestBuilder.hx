@@ -188,6 +188,11 @@ class TestBuilder {
 				checkKind(':after', After);
 				if(kind == null) kind = Test;
 				
+				switch field.meta.extract(':benchmark') {
+					case []: // ok
+					case _: field.pos.warning('Did you forget to implement tink.unit.Benchmark, which enables the @:benchmark metadata?');
+				}
+				
 				var description = switch field.meta.extract(':describe') {
 					case []: fname;
 					case v: [for(v in v) v.params[0].getString().sure()].join('\n');

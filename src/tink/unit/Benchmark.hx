@@ -16,7 +16,8 @@ class Benchmark {
 		for(field in builder) {
 			switch [field.kind, field.metaNamed(':benchmark')] {
 				case [_, []]: // skip
-				case [FFun(func), [{pos: pos, params: [{expr: EConst(CInt(Std.parseInt(_) => i))}]}]]:
+				case [FFun(func), [meta = {pos: pos, params: [{expr: EConst(CInt(Std.parseInt(_) => i))}]}]]:
+					field.meta.remove(meta);
 					func.expr = macro @:pos(pos) {
 						var start = haxe.Timer.stamp();
 						for(_ in 0...$v{i}) ${func.expr};
