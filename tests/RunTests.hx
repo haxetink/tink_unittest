@@ -33,6 +33,7 @@ class RunTests {
 		var grandParent = new GrandParentTest();
 		var parent = new ParentTest();
 		var child = new ChildTest();
+		var benchmark = new BenchmarkTest();
 		futures.push(
 			function() return Runner.run(TestBatch.make([
 				normal,
@@ -41,6 +42,7 @@ class RunTests {
 				grandParent,
 				parent,
 				child,
+				benchmark,
 			])).map(function(result) {
 				assertEquals(0, result.summary().failures.length);
 				assertEquals('ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2bb2variant1aa2bb2variant2aa2bb2variant3aa2bb2variant21aa2dd2', normal.result);
@@ -176,12 +178,16 @@ class NormalTest implements tink.unit.Benchmark {
 		return assert(a == a);
 	}
 	
+	function int() return 1;
+}
+
+class BenchmarkTest implements tink.unit.Benchmark {
+	public function new() {}
+	
 	@:describe('Benchmark Math.sqrt()')
 	@:benchmark(10000)
 	public function benchmark()
 		for(i in 0...10000) Math.sqrt(i);
-	
-	function int() return 1;
 }
 
 @:await
