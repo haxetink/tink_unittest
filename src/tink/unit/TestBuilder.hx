@@ -75,7 +75,7 @@ class TestBuilder {
 							kind: FFun({
 								args: [],
 								ret: macro:tink.core.Promise<tink.core.Noise>,
-								expr: macro return target.$fname(),
+								expr: macro @:pos(field.field.pos) return target.$fname(),
 							}),
 							pos: field.field.pos,
 						});
