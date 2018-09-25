@@ -23,7 +23,7 @@ private typedef Impl = tink.streams.Accumulator<Assertion>;
 
 
 
-abstract AssertionBuffer(Impl) to Assertions {
+abstract AssertionBuffer(Impl) from Impl to Assertions {
 	
 	public macro function assert(ethis:Expr, result:ExprOf<Bool>, ?description:ExprOf<String>, ?pos:ExprOf<haxe.PosInfos>):ExprOf<Assertion> {
 		var args = [result, description];
@@ -44,12 +44,17 @@ abstract AssertionBuffer(Impl) to Assertions {
 	public inline function fail(?code:Int, reason:FailingReason, ?pos:haxe.PosInfos):AssertionBuffer {
 		if(code == null) code = reason.code;
 		this.yield(Fail(new Error(code, reason.message, pos)));
-		return cast this;
+		return this;
+	}
+	
+	public function defer(f:Void->Void):AssertionBuffer {
+		Callback.defer(f);
+		return this;
 	}
 	
 	public inline function done():AssertionBuffer {
 		this.yield(End);
-		return cast this;
+		return this;
 	}
 	
 	public function handle<T>(outcome:Outcome<T, Error>)
