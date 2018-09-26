@@ -70,7 +70,12 @@ class Assert {
 			var start = haxe.Timer.stamp();
 			for(_ in 0...i) $body;
 			var dt = haxe.Timer.stamp() - start;
-			new tink.testrunner.Assertion(true, 'Benchmark: ' + i + ' iterations = ' + dt + 's');
+			var str = Std.string(dt * 1000);
+			switch str.indexOf('.') {
+				case -1: // ok
+				case i: str = str.substr(0, i + 7);
+			}
+			new tink.testrunner.Assertion(true, 'Benchmark: ' + i + ' iterations = ' + str + ' ms');
 		}
 	}
 	
