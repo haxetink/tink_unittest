@@ -18,12 +18,7 @@ class Benchmark {
 				case [_, []]: // skip
 				case [FFun(func), [meta = {pos: pos, params: [{expr: EConst(CInt(Std.parseInt(_) => i))}]}]]:
 					field.meta.remove(meta);
-					func.expr = macro @:pos(pos) {
-						var start = haxe.Timer.stamp();
-						for(_ in 0...$v{i}) ${func.expr};
-						var dt = haxe.Timer.stamp() - start;
-						return new tink.testrunner.Assertion(true, 'Benchmark: ' + $v{i} + ' iterations = ' + dt + 's');
-					}
+					func.expr = macro return tink.unit.Assert.benchmark($v{i}, ${func.expr});
 				case _: field.pos.error('Invalid use of @:benchmark. Only one @:benchmark is supported on each field and it should has exactly one Int parameter');
 			}
 		}

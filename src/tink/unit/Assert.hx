@@ -64,6 +64,16 @@ class Assert {
 		return pre.concat(macro @:pos(expr.pos) new tink.testrunner.Assertion($a{args}));
 	}
 	
+	public static macro function benchmark(iterations:ExprOf<Int>, body:Expr):ExprOf<tink.testrunner.Assertion> {
+		return macro @:pos(body.pos) {
+			var i = $iterations;
+			var start = haxe.Timer.stamp();
+			for(_ in 0...i) $body;
+			var dt = haxe.Timer.stamp() - start;
+			new tink.testrunner.Assertion(true, 'Benchmark: ' + i + ' iterations = ' + dt + 's');
+		}
+	}
+	
 	#if !macro
 	public static function fail(e:tink.core.Error, ?pos:haxe.PosInfos):Assertions
 		return #if pure Stream.ofError(e) #else Stream.failure(e) #end;

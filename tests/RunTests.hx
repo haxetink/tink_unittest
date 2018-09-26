@@ -182,12 +182,15 @@ class NormalTest implements tink.unit.Benchmark {
 }
 
 class BenchmarkTest implements tink.unit.Benchmark {
+	
+	var result:Float = 0;
+	
 	public function new() {}
 	
 	@:describe('Benchmark Math.sqrt()')
 	@:benchmark(10000)
 	public function benchmark()
-		for(i in 0...10000) Math.sqrt(i);
+		for(i in 0...10000) result += Math.sqrt(i);
 }
 
 @:await
