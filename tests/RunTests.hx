@@ -187,10 +187,17 @@ class BenchmarkTest implements tink.unit.Benchmark {
 	
 	public function new() {}
 	
-	@:describe('Benchmark Math.sqrt()')
+	@:describe('Benchmark Math.sqrt() with build macro')
 	@:benchmark(10000)
 	public function benchmark()
 		for(i in 0...10000) result += Math.sqrt(i);
+	
+	@:describe('Benchmark Math.sqrt() with expression macro')
+	public function benchmark2() {
+		result = 0;
+		return tink.unit.Assert.benchmark(10000, for(i in 0...10000) result += Math.sqrt(i));
+	}
+		
 }
 
 @:await
