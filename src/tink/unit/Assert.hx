@@ -71,7 +71,8 @@ class Assert {
 			for(_ in 0...__iter) $body;
 			var dt = haxe.Timer.stamp() - start;
 			var str = Std.string(dt * 1000);
-			switch str.indexOf('.') {
+			if(str == '0') str = '0.000001';
+			else switch str.indexOf('.') {
 				case -1: // ok
 				case index: str = str.substr(0, index + 7);
 			}
