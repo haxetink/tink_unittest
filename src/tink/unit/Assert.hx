@@ -66,16 +66,16 @@ class Assert {
 	
 	public static macro function benchmark(iterations:ExprOf<Int>, body:Expr):ExprOf<tink.testrunner.Assertion> {
 		return macro @:pos(body.pos) {
-			var i = $iterations;
+			var __iter = $iterations;
 			var start = haxe.Timer.stamp();
-			for(_ in 0...i) $body;
+			for(_ in 0...__iter) $body;
 			var dt = haxe.Timer.stamp() - start;
 			var str = Std.string(dt * 1000);
 			switch str.indexOf('.') {
 				case -1: // ok
-				case i: str = str.substr(0, i + 7);
+				case index: str = str.substr(0, index + 7);
 			}
-			new tink.testrunner.Assertion(true, 'Benchmark: ' + i + ' iterations = ' + str + ' ms');
+			new tink.testrunner.Assertion(true, 'Benchmark: ' + __iter + ' iterations = ' + str + ' ms');
 		}
 	}
 	
