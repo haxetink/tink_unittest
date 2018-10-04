@@ -34,7 +34,7 @@ class Assert {
 				switch expr {
 					case { expr: EBinop(op, e1, e2) }:
 						
-						var operator = printer.printBinop(op);
+						var opStr = printer.printBinop(op);
 						var operation = EBinop(op, macro @:pos(e1.pos) lh, macro @:pos(e2.pos) rh).at(expr.pos);
 						
 						pre = macro {
@@ -43,7 +43,7 @@ class Assert {
 							var rh = $e2;
 						}
 						assertion = operation;
-						description = macro $description + ' (' + tink.unit.Assert.stringify(lh) + ' ' + $v{operator} + ' ' + tink.unit.Assert.stringify(rh) + ')';
+						description = macro $description + ' (' + tink.unit.Assert.stringify(lh) + ' ' + $v{opStr} + ' ' + tink.unit.Assert.stringify(rh) + ')';
 						
 					case macro $e1.match($e2):
 						pre = macro {
