@@ -128,11 +128,10 @@ class TestBuilder {
 					this.target = target;
 				}
 				
+				override function setup() return ${makeServiceLoop(runnables[Setup])};
 				override function before() return ${makeServiceLoop(runnables[Before])};
 				override function after() return ${makeServiceLoop(runnables[After])};
-				
-				function setup() return ${makeServiceLoop(runnables[Setup])};
-				function teardown() return ${makeServiceLoop(runnables[Teardown])};
+				override function teardown() return ${makeServiceLoop(runnables[Teardown])};
 			}
 			def.fields = def.fields.concat(fields); 
 			def.pack = ['tink', 'unit'];
