@@ -6,7 +6,7 @@ import haxe.PosInfos;
 
 using tink.CoreApi;
 
-class TestCase implements Case {
+class TestCase implements CaseObject {
 	public var info:CaseInfo;
 	public var timeout:Int;
 	public var include:Bool;
