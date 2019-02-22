@@ -10,8 +10,8 @@
 		"kevinresol",
 		"back2dos"
 	],
-	"version": "0.5.7",
-	"releasenote": "Haxe 4 fix",
+	"version": "0.6.0",
+	"releasenote": "Fix upstream changes (tink_testrunner 0.7.0)",
 	"tags": [],
 	"license": "MIT"
 }
