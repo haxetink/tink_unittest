@@ -2,11 +2,13 @@ package tink.unit;
 
 import tink.testrunner.Assertions;
 import tink.testrunner.Case;
+import tink.testrunner.Suite;
 import haxe.PosInfos;
 
 using tink.CoreApi;
 
 class TestCase implements CaseObject {
+	public var suite:Suite;
 	public var info:CaseInfo;
 	public var timeout:Int;
 	public var include:Bool;
