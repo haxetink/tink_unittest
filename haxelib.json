@@ -10,8 +10,8 @@
 		"kevinresol",
 		"back2dos"
 	],
-	"version": "0.6.0",
-	"releasenote": "Fix upstream changes (tink_testrunner 0.7.0)",
+	"version": "0.6.1",
+	"releasenote": "Store suite ref in a case",
 	"tags": [],
 	"license": "MIT"
 }
