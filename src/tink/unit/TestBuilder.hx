@@ -48,7 +48,7 @@ class TestBuilder {
 							timeout: field.timeout,
 							exclude: field.exclude,
 							include: field.include,
-							pos: transformPos(field.field.pos, fname, cname),
+							pos: transformPos(field.field.pos, {methodName: fname, className: cname}),
 							runnable: macro @:pos(field.field.pos) function():tink.testrunner.Assertions return target.$fname($a{args}),
 						});
 						
@@ -62,9 +62,10 @@ class TestBuilder {
 								timeout: field.timeout,
 								exclude: field.exclude,
 								include: field.include,
-								pos: transformPos(v.pos, fname, cname),
+								pos: transformPos(v.pos, {methodName: fname, className: cname}),
 								runnable: macro @:pos(field.field.pos) function():tink.testrunner.Assertions return target.$fname($a{args}),
 							});
+							
 						}
 					
 					default:
@@ -121,10 +122,19 @@ class TestBuilder {
 			}
 			
 			var ct = type.toComplex();
+			var pos = transformPos(type.getPosition().sure(), {className: type.getID()});
 			var def = macro class $clsname extends tink.unit.TestSuite.TestSuiteBase<$ct> {
 				
 				public function new(target:$ct, ?name:String) {
-					super({name: name == null ? $v{info.name} : name} , $a{tinkCases});
+					super({
+						name: name == null ? $v{info.name} : name,
+						pos: {
+							lineNumber: $v{pos.lineNumber},
+							fileName: $v{pos.fileName},
+							methodName: $v{pos.methodName},
+							className: $v{pos.className},
+						}
+					} , $a{tinkCases});
 					this.target = target;
 				}
 				
@@ -135,6 +145,7 @@ class TestBuilder {
 			}
 			def.fields = def.fields.concat(fields); 
 			def.pack = ['tink', 'unit'];
+			
 			return def;
 		});
 	}
@@ -204,9 +215,9 @@ class TestBuilder {
 						function subst(e:Expr)
 							return switch e {
 								case macro this.$field: 
-									macro @:pos(e.pos) (@:privateAccess this.target.$field);
+									macro @:pos(e.pos) @:privateAccess this.target.$field;
 								case macro this: 
-									macro @:pos(e.pos) (@:privateAccess this.target);
+									macro @:pos(e.pos) @:privateAccess this.target;
 								default:
 									e.map(subst);
 							}
@@ -283,21 +294,28 @@ class TestBuilder {
 			case p: p[0].pos.error('Multiple @:timeout meta');
 		} 
 	
-	static function transformPos(p:Position, ?methodName:String, ?className:String):haxe.PosInfos 
+	static function transformPos(p:Position, ?overrides:PosInfoOverrides):haxe.PosInfos 
 		return 
 			switch Context.getTypedExpr(Context.typeExpr(macro @:pos(p) (function (?pos:haxe.PosInfos) return pos.lineNumber)())) {
 				case macro $_({ fileName: $f, lineNumber: $l, className: $c, methodName: $m }):
-					function get(s:String, e:Expr) 
-						return if (s == null) e.getString().sure() else s;
+					if(overrides == null) overrides = {}
+					inline function get<T>(overridden:T, base:T) return overridden == null ? base : overridden;
 					{ 
-						fileName: f.getString().sure(), 
-						lineNumber: l.getInt().sure(), 
-						className: get(className, c),
-						methodName: get(methodName, m),
+						fileName: get(overrides.fileName, f.getString().sure()), 
+						lineNumber: get(overrides.lineNumber, l.getInt().sure()), 
+						className: get(overrides.className, null), // FIXME: c.getString().sure() points to the macro callsite (i.e. what haxe.macro.Context refers to)
+						methodName: get(overrides.methodName, null), // FIXME: m.getString().sure() points to the macro callsite (i.e. what haxe.macro.Context refers to)
 					}
 				default: null;
 			}
 
+}
+
+private typedef PosInfoOverrides = {
+	?fileName:String,
+	?lineNumber:Int,
+	?className:String,
+	?methodName:String,
 }
 
 private typedef TestInfo = {
