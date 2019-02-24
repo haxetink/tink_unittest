@@ -10,8 +10,8 @@
 		"kevinresol",
 		"back2dos"
 	],
-	"version": "0.6.1",
-	"releasenote": "Store suite ref in a case",
+	"version": "0.6.2",
+	"releasenote": "Store suite position",
 	"tags": [],
 	"license": "MIT"
 }
