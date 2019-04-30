@@ -33,17 +33,17 @@ class Assert {
 				// TODO: we can actually do a recursive breakdown: e.g. `a == 1 && b == 2`
 				switch expr {
 					case { expr: EBinop(op, e1, e2) }:
-						
-						var opStr = printer.printBinop(op);
-						var operation = EBinop(op, macro @:pos(e1.pos) lh, macro @:pos(e2.pos) rh).at(expr.pos);
+						var lct = Context.typeof(e1).toComplex();
+						var rct = Context.typeof(e2).toComplex();
 						
 						pre = macro {
 							// store the values to avoid evaluating the expressions twice
 							var lh = $e1; 
 							var rh = $e2;
 						}
-						assertion = operation;
-						description = macro $description + ' (' + tink.unit.Assert.stringify(lh) + ' ' + $v{opStr} + ' ' + tink.unit.Assert.stringify(rh) + ')';
+						
+						assertion = EBinop(op, macro @:pos(e1.pos) (lh:$lct), macro @:pos(e2.pos) (rh:$rct)).at(expr.pos);
+						description = macro $description + ' (' + tink.unit.Assert.stringify(lh) + ' ' + $v{printer.printBinop(op)} + ' ' + tink.unit.Assert.stringify(rh) + ')';
 						
 					case macro $e1.match($e2):
 						pre = macro {
