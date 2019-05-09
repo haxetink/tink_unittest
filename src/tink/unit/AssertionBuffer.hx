@@ -29,10 +29,23 @@ abstract AssertionBuffer(Impl) from Impl to Assertions {
 		var args = [result, description];
 		switch pos {
 			case macro null:
-			default: args.push(pos);
+			case _: args.push(pos);
 		}
 		return macro @:pos(ethis.pos) $ethis.emit(tink.unit.Assert.assert($a{args}));
 	}
+	
+	#if deep_equal
+	
+	public macro function compare(ethis:Expr, expected:Expr, actual:Expr, ?description:ExprOf<String>, ?pos:ExprOf<haxe.PosInfos>) {
+		var args = [expected, actual, description];
+		switch pos {
+			case macro null:
+			case _: args.push(pos);
+		}
+		return macro @:pos(ethis.pos) $ethis.emit(tink.unit.Assert.compare($a{args}));
+	}
+		
+	#end
 		
 	#if !macro
 	public inline function new()

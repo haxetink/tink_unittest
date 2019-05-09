@@ -64,6 +64,33 @@ class Assert {
 		return pre.concat(macro @:pos(expr.pos) new tink.testrunner.Assertion($a{args}));
 	}
 	
+	#if deep_equal
+	
+	public static macro function compare(expected:Expr, actual:Expr, ?description:ExprOf<String>, ?pos:ExprOf<haxe.PosInfos>):ExprOf<Assertion> {
+		
+		var pre = macro {
+			@:pos(expected.pos) var expected = $expected;
+			@:pos(actual.pos) var actual = $actual;
+		}
+		
+		var args = [
+			macro deepequal.DeepEqual.compare(expected, actual),
+			switch description {
+				case macro null: macro '\nExpected : ' + expected + '\nActual   : ' + actual;
+				case v: v;
+			}
+		];
+		switch pos {
+			case macro null:
+			case _: args.push(pos);
+		}
+		
+		var pos = Context.currentPos();
+		return pre.concat(macro @:pos(pos) new tink.testrunner.Assertion($a{args}));
+	}
+		
+	#end
+	
 	public static macro function benchmark(iterations:ExprOf<Int>, body:Expr):ExprOf<tink.testrunner.Assertion> {
 		return macro @:pos(body.pos) {
 			var __iter = $iterations;
