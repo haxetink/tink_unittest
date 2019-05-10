@@ -110,8 +110,9 @@ class TestBuilder {
 				});
 			}
 			
+			var noiseExpr = macro tink.core.Promise.NOISE;
 			function makeServiceLoop(f:Array<Expr>) {
-				if(f.length == 0) return macro tink.core.Promise.NOISE;
+				if(f.length == 0) return noiseExpr;
 				var fields = f.copy();
 				fields.reverse(); // because the call tree is inside-out
 				var expr = fields.fold(function(f, expr) return macro $f().handle(function(o) switch o {
@@ -137,12 +138,17 @@ class TestBuilder {
 					} , $a{tinkCases});
 					this.target = target;
 				}
-				
-				override function setup() return ${makeServiceLoop(runnables[Setup])};
-				override function before() return ${makeServiceLoop(runnables[Before])};
-				override function after() return ${makeServiceLoop(runnables[After])};
-				override function teardown() return ${makeServiceLoop(runnables[Teardown])};
 			}
+			
+			// override service functions
+			for(kind in [Setup, Before, After, Teardown])
+				switch makeServiceLoop(runnables[kind]) {
+					case e if (e != noiseExpr):
+						var func = kind.getName().toLowerCase();
+						def.fields.push((macro class {override function $func() return $e; }).fields[0]);
+					case _:
+				}
+			
 			def.fields = def.fields.concat(fields); 
 			def.pack = ['tink', 'unit'];
 			
