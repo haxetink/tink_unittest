@@ -253,8 +253,8 @@ class TestBuilder {
 					switch type {
 						case TFun(args, ret):
 							for(i in 0...args.length)
-								switch args[i].t {
-									case TDynamic(null): // ignore
+								switch args[i].t.reduce() {
+									case TDynamic(null) | TAbstract(_.get() => {name: 'Any', pack: []}, _): // ignore
 									case t if(Context.unify(t, Context.getType('tink.unit.AssertionBuffer'))):
 										bufferIndex = i;
 										break;
