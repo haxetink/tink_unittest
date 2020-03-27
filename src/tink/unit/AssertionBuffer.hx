@@ -31,7 +31,11 @@ abstract AssertionBuffer(Impl) from Impl to Assertions {
 			case macro null:
 			case _: args.push(pos);
 		}
-		return macro @:pos(ethis.pos) $ethis.emit(tink.unit.Assert.assert($a{args}));
+		return macro @:pos(ethis.pos) {
+			var assertion = tink.unit.Assert.assert($a{args});
+			$ethis.emit(assertion);
+			assertion;
+		}
 	}
 	
 	#if deep_equal
