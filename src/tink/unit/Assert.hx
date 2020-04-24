@@ -58,8 +58,7 @@ class Assert {
 							var value = $e1;
 						}
 						assertion = macro @:pos(expr.pos) value.match($e2);
-						description = macro $description + ' (' + $v{e1.toString()} + ' => ' + tink.unit.Assert.stringify(value) + ')'
-							;
+						description = macro $description + ' (' + $v{e1.toString()} + ' => ' + tink.unit.Assert.stringify(value) + ')';
 					default:
 				}
 			default:
