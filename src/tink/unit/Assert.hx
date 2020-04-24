@@ -29,30 +29,39 @@ class Assert {
 		switch description {
 			case macro null:
 				description = macro $v{expr.toString()};
-				
+
 				// TODO: we can actually do a recursive breakdown: e.g. `a == 1 && b == 2`
 				switch expr {
-					case { expr: EBinop(op, e1, e2) }:
-						var lct = Context.typeof(e1).toComplex();
-						var rct = Context.typeof(e2).toComplex();
-						
-						pre = macro {
-							// store the values to avoid evaluating the expressions twice
-							var lh = $e1; 
-							var rh = $e2;
+					case {expr: EBinop(op, e1, e2), pos: pos}:
+						switch Context.typeExpr(expr) { // type it as a whole to preserve top-down inference
+							case t_expr = {expr: TBinop(t_op, t_e1, t_e2)}:
+								var stored = Context.storeTypedExpr(t_expr);
+								var lstored = Context.storeTypedExpr(t_e1);
+								var rstored = Context.storeTypedExpr(t_e2);
+								
+								var lct = t_e1.t.toComplex();
+								var rct = t_e2.t.toComplex();
+		
+								pre = macro {
+									// store the values to avoid evaluating the expressions twice
+									var lh = $lstored;
+									var rh = $rstored;
+								}
+		
+								assertion = EBinop(op, macro @:pos(e1.pos) lh, macro @:pos(e2.pos) rh).at(pos);
+								description = macro $description + ' (' + tink.unit.Assert.stringify(lh) + ' ' + $v{printer.printBinop(op)} + ' ' + tink.unit.Assert.stringify(rh) + ')';
+							case _: throw 'unreachable';
 						}
-						
-						assertion = EBinop(op, macro @:pos(e1.pos) (lh:$lct), macro @:pos(e2.pos) (rh:$rct)).at(expr.pos);
-						description = macro $description + ' (' + tink.unit.Assert.stringify(lh) + ' ' + $v{printer.printBinop(op)} + ' ' + tink.unit.Assert.stringify(rh) + ')';
-						
+
 					case macro $e1.match($e2):
 						pre = macro {
 							var value = $e1;
 						}
 						assertion = macro @:pos(expr.pos) value.match($e2);
-						description = macro $description + ' (' + $v{e1.toString()} + ' => ' + tink.unit.Assert.stringify(value) + ')';
+						description = macro $description + ' (' + $v{e1.toString()} + ' => ' + tink.unit.Assert.stringify(value) + ')'
+							;
 					default:
-				}	
+				}
 			default:
 		}
 		
