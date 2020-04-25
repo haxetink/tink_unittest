@@ -33,6 +33,7 @@ class RunTests {
 		var grandParent = new GrandParentTest();
 		var parent = new ParentTest();
 		var child = new ChildTest();
+		var abs = new AbstractCastTest();
 		var benchmark = new BenchmarkTest();
 		futures.push(
 			function() return Runner.run(TestBatch.make([
@@ -42,6 +43,7 @@ class RunTests {
 				grandParent,
 				parent,
 				child,
+				abs,
 				benchmark,
 			])).map(function(result) {
 				assertEquals(0, result.summary().failures.length);
@@ -342,4 +344,18 @@ class ChildTest extends ParentTest {
 		debug('child');
 		return assert(true);
 	}
+}
+
+class AbstractCastTest {
+	public function new() {}
+	public function eq() {
+		var a = new Abs(1);
+		var b = new Abs(1);
+		return assert(a == b);
+	}
+}
+
+abstract Abs(Int) {
+	public inline function new(v) this = v;
+	@:op(A==B) static function eq(a:Abs, b:Abs):Bool;
 }
