@@ -34,7 +34,7 @@ class Assert {
 				switch expr {
 					case {expr: EBinop(op, e1, e2), pos: pos}:
 						switch Context.typeExpr(expr) { // type it as a whole to preserve top-down inference
-							case t_expr = {expr: TBinop(t_op, t_e1, t_e2)}:
+							case t_expr = {expr: TBinop(t_op, t_e1, t_e2) | TCast({expr: TBinop(t_op, t_e1, t_e2)}, _)}:
 								var stored = Context.storeTypedExpr(t_expr);
 								var lstored = Context.storeTypedExpr(t_e1);
 								var rstored = Context.storeTypedExpr(t_e2);
