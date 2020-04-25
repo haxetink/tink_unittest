@@ -50,7 +50,20 @@ class Assert {
 		
 								assertion = EBinop(op, macro @:pos(e1.pos) lh, macro @:pos(e2.pos) rh).at(pos);
 								description = macro $description + ' (' + tink.unit.Assert.stringify(lh) + ' ' + $v{printer.printBinop(op)} + ' ' + tink.unit.Assert.stringify(rh) + ')';
-							case _: throw 'unreachable';
+							case v:
+								expr.pos.warning('Please report this to tink_unittest: Unhandled TypedExpr: $v');
+								
+								var lct = Context.typeof(e1).toComplex();
+								var rct = Context.typeof(e2).toComplex();
+								
+								pre = macro {
+									// store the values to avoid evaluating the expressions twice
+									var lh = $e1; 
+									var rh = $e2;
+								}
+								
+								assertion = EBinop(op, macro @:pos(e1.pos) (lh:$lct), macro @:pos(e2.pos) (rh:$rct)).at(expr.pos);
+								description = macro $description + ' (' + tink.unit.Assert.stringify(lh) + ' ' + $v{printer.printBinop(op)} + ' ' + tink.unit.Assert.stringify(rh) + ')';
 						}
 
 					case macro $e1.match($e2):
