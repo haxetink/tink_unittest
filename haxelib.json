@@ -10,8 +10,8 @@
 		"kevinresol",
 		"back2dos"
 	],
-	"version": "0.6.2",
-	"releasenote": "Store suite position",
+	"version": "0.7.0",
+	"releasenote": "TestBatch accepts rest arguments. Preserve top-down inference when transforming binop expr in Assert",
 	"tags": [],
 	"license": "MIT"
 }
