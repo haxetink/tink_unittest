@@ -14,7 +14,7 @@ tink.unit.Assert.assert(value == 1);
 will be transformed to:
 
 ```haxe
-new Assertion(value == 1, 'value == 1');
+new Assertion(value == 1, '$value == 1');
 ```
 
 In other words, your Haxe code will be printed on screen so that one can easily
