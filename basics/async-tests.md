@@ -1,6 +1,6 @@
 # Async Tests
 
-In addition to the ways [mentioned](https://haxetink.github.io/tink_testrunner/#/basics/async-tests) in `tink_testrunner`, `tink_unittest` provides a helper class `AssertionBuffer` for multiple and async assertions.
+`tink_unittest` provides a helper class `AssertionBuffer` for multiple and async assertions, in addition to the ways [mentioned](https://haxetink.github.io/tink_testrunner/#/basics/async-tests) in `tink_testrunner`.
 
 
 ## Assertion Buffer

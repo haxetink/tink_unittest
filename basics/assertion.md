@@ -1,6 +1,6 @@
 # Assertions
 
-In addition to the ways to construct an assertion as [mentioned](https://haxetink.github.io/tink_testrunner/#/basics/assertion) in `tink_testrunner`, `tink_unittest` provides a handy function ease the process.
+`tink_unittest` provides a handy function to construct an assertion, in addition to the ways [mentioned](https://haxetink.github.io/tink_testrunner/#/basics/assertion) in `tink_testrunner`.
 
 ## Macro solution
 
