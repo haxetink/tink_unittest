@@ -90,8 +90,8 @@ class Assert {
 	public static macro function compare(expected:Expr, actual:Expr, ?description:ExprOf<String>, ?pos:ExprOf<haxe.PosInfos>):ExprOf<Assertion> {
 		
 		var pre = macro {
-			@:pos(expected.pos) var expected = $expected;
-			@:pos(actual.pos) var actual = $actual;
+			@:pos(expected.pos) var expected:Dynamic = $expected;
+			@:pos(actual.pos) var actual:Dynamic = $actual;
 		}
 		
 		var args = [
