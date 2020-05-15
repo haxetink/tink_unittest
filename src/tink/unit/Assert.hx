@@ -3,6 +3,8 @@ package tink.unit;
 import tink.testrunner.Assertion;
 import tink.testrunner.Assertions;
 import tink.streams.Stream;
+
+using Lambda;
 #if macro
 import haxe.macro.*;
 import haxe.macro.Expr;
@@ -48,11 +50,10 @@ class Assert {
 								}
 
 								assertion = EBinop(op, macro @:pos(e1.pos) lh, macro @:pos(e2.pos) rh).at(pos);
-								description = macro $description + ' (' + tink.unit.Assert.stringify(lh) + ' ' + $v{printer.printBinop(op)} + ' ' + tink.unit.Assert.stringify(rh) + ')';
+								description = macro $description + ' (' + ${stringify(macro lh, t_e1.t)} + ' ' + $v{printer.printBinop(op)} + ' ' + ${stringify(macro rh, t_e2.t)} + ')';
 							case v:
-
-								var lt = Context.typeof(e1),
-										rt = Context.typeof(e2);
+								var lt = Context.typeof(e1);
+								var rt = Context.typeof(e2);
 
 								function isAbstract(t:Type)
 									return t.reduce().match(TAbstract(_));
@@ -70,7 +71,7 @@ class Assert {
 								}
 
 								assertion = EBinop(op, macro @:pos(e1.pos) (lh:$lct), macro @:pos(e2.pos) (rh:$rct)).at(expr.pos);
-								description = macro $description + ' (' + tink.unit.Assert.stringify(lh) + ' ' + $v{printer.printBinop(op)} + ' ' + tink.unit.Assert.stringify(rh) + ')';
+								description = macro $description + ' (' + ${stringify(macro lh, lt)} + ' ' + $v{printer.printBinop(op)} + ' ' + ${stringify(macro rh, rt)} + ')';
 						}
 
 					case macro $e1.match($e2):
@@ -78,7 +79,7 @@ class Assert {
 							var value = $e1;
 						}
 						assertion = macro @:pos(expr.pos) value.match($e2);
-						description = macro $description + ' (' + $v{e1.toString()} + ' => ' + tink.unit.Assert.stringify(value) + ')';
+						description = macro $description + ' (' + $v{e1.toString()} + ' => ' + ${stringify(macro value, Context.typeof(e1))} + ')';
 					default:
 				}
 			default:
@@ -134,15 +135,24 @@ class Assert {
 			new tink.testrunner.Assertion(true, 'Benchmark: ' + __iter + ' iterations = ' + __str + ' ms');
 		}
 	}
-
-	#if !macro
-	public static function fail(e:tink.core.Error, ?pos:haxe.PosInfos):Assertions
-		return #if pure Stream.ofError(e) #else Stream.failure(e) #end;
-
-	public static function stringify(v:Dynamic) {
-		return
-			if(Std.is(v, String) || Std.is(v, Float) || Std.is(v, Bool)) haxe.Json.stringify(v);
-			else Std.string(v);
+	
+	#if macro
+	static function stringify(e:Expr, t:haxe.macro.Type) {
+		return switch t {
+			case _.getID() => 'String':
+				macro '"' + ($e:String) + '"';
+			case TAbstract(_.get() => {name: name, to: to}, _) if(to.exists(v -> v.t.getID() == 'String' && v.field == null)): // "to String"
+				macro '"' + ($e:String) + '"';
+			case TAbstract(_.get() => {name: name, to: to}, _) if(to.exists(v -> v.t.getID() == 'String' && v.field != null)):  // "@:to String"
+				macro ($e:String);
+			case _:
+				macro Std.string($e);
+		}
 	}
+	#end
+	
+	#if !macro
+	public static inline function fail(e:tink.core.Error, ?pos:haxe.PosInfos):Assertions
+		return Stream.ofError(e);
 	#end
 }

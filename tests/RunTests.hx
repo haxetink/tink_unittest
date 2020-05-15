@@ -45,6 +45,7 @@ class RunTests {
 				child,
 				abs,
 				benchmark,
+				new StringificationTest(),
 			])).map(function(result) {
 				assertEquals(0, result.summary().failures.length);
 				assertEquals('ss2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2bb2variant1aa2bb2variant2aa2bb2variant3aa2bb2variant21aa2dd2', normal.result);
@@ -355,7 +356,32 @@ class AbstractCastTest {
 	}
 }
 
+@:asserts
+class StringificationTest {
+	public function new() {}
+	public function eq() {
+		var i = 2;
+		asserts.assert(i == 2);
+		var b = true;
+		asserts.assert(b);
+		var u = new UnderlyingString('foo');
+		asserts.assert(u == 'foo');
+		var c = new CastableToString(1);
+		asserts.assert(c == 'Value=1');
+		asserts.assert(c == 1);
+		return asserts.done();
+	}
+}
+
 abstract Abs(Int) {
 	public inline function new(v) this = v;
 	@:op(A==B) static function eq(a:Abs, b:Abs):Bool;
+}
+
+abstract UnderlyingString(String) to String {
+	public inline function new(v) this = v;
+}
+abstract CastableToString(Int) to Int {
+	public inline function new(v) this = v;
+	@:to public inline function stringify():String return 'Value=$this';
 }
