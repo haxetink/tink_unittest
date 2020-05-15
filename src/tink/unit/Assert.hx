@@ -141,9 +141,9 @@ class Assert {
 		return switch t {
 			case _.getID() => 'String':
 				macro '"' + ($e:String) + '"';
-			case TAbstract(_.get() => {name: name, to: to}, _) if(to.exists(v -> v.t.getID() == 'String' && v.field == null)): // "to String"
+			case TAbstract(_.get() => {name: name, to: to}, _) if(to.exists(function(v) return v.t.getID() == 'String' && v.field == null)): // "to String"
 				macro '"' + ($e:String) + '"';
-			case TAbstract(_.get() => {name: name, to: to}, _) if(to.exists(v -> v.t.getID() == 'String' && v.field != null)):  // "@:to String"
+			case TAbstract(_.get() => {name: name, to: to}, _) if(to.exists(function(v) return v.t.getID() == 'String' && v.field != null)):  // "@:to String"
 				macro ($e:String);
 			case _:
 				macro Std.string($e);
