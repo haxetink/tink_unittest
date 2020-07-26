@@ -6,7 +6,6 @@ import haxe.macro.Expr;
 
 using tink.CoreApi;
 
-#if pure 
 private class Impl extends SignalStream<Assertion, Error> {
 	var trigger:SignalTrigger<Yield<Assertion, Error>>;
 	public function new() {
@@ -17,12 +16,9 @@ private class Impl extends SignalStream<Assertion, Error> {
 	public inline function yield(data)
 		trigger.trigger(data);
 }
-#else
-private typedef Impl = tink.streams.Accumulator<Assertion>;
-#end
 
 
-
+@:transitive
 abstract AssertionBuffer(Impl) from Impl to Assertions {
 	
 	public macro function assert(ethis:Expr, result:ExprOf<Bool>, ?description:ExprOf<String>, ?pos:ExprOf<haxe.PosInfos>):ExprOf<Assertion> {
