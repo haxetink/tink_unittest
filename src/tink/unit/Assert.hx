@@ -14,6 +14,39 @@ using tink.MacroApi;
 class Assert {
 	static var printer = new haxe.macro.Printer();
 
+	public static macro function expectCompilerError(expr:Expr, ?pattern:ExprOf<EReg>, ?description:ExprOf<String>, ?pos:ExprOf<haxe.PosInfos>):ExprOf<Assertion> {
+		var error = null;
+		try Context.typeof(expr)
+		catch (e:Dynamic) {
+			error = Std.string(e);
+		}
+
+		var ereg = switch pattern {
+			case null | macro null: null;
+			case { expr: EConst(CString(s)) }: new EReg(s, '');
+			case { expr: EConst(CRegexp(r, opt)) }: new EReg(r, opt);
+			default: pattern.reject('expected string or regex literal');
+		}
+
+		switch description {
+			case null | macro null:
+				var error = switch error {
+					case null: 'no error';
+					case v: v;
+				}
+
+				description = (
+					if (ereg == null) '`${expr.toString()}` should not to compile ($error)';
+					else '`${expr.toString()}` should produce error matching ${pattern.toString()} ($error)'
+				).toExpr();
+			default:
+		}
+
+		var ok = error != null && (ereg == null || ereg.match(error));
+
+		return macro tink.unit.Assert.assert($v{ok}, $description, $pos);
+	}
+
 	public static macro function assert(expr:ExprOf<Bool>, ?description:ExprOf<String>, ?pos:ExprOf<haxe.PosInfos>):ExprOf<Assertion> {
 		var pre = macro {};
 		var assertion = expr;
