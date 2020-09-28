@@ -78,8 +78,8 @@ class Assert {
 
 								pre = macro {
 									// store the values to avoid evaluating the expressions twice
-									var lh = $lstored;
-									var rh = $rstored;
+									var lh:$lct = $lstored;
+									var rh:$rct = $rstored;
 								}
 
 								assertion = EBinop(op, macro @:pos(e1.pos) lh, macro @:pos(e2.pos) rh).at(pos);
