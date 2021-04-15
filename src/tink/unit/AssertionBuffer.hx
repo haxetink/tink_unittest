@@ -4,6 +4,9 @@ import tink.testrunner.*;
 import tink.streams.Stream;
 import haxe.macro.Expr;
 
+#if macro
+using tink.MacroApi;
+#end
 using tink.CoreApi;
 
 private class Impl extends SignalStream<Assertion, Error> {
@@ -20,6 +23,19 @@ private class Impl extends SignalStream<Assertion, Error> {
 
 @:transitive
 abstract AssertionBuffer(Impl) from Impl to Assertions {
+	
+	public macro function expectCompilerError(ethis:Expr, expr:Expr, ?pattern:ExprOf<EReg>, ?description:ExprOf<String>, ?pos:ExprOf<haxe.PosInfos>):ExprOf<Assertion> {
+		var args = [expr, pattern, description];
+		switch pos {
+			case macro null:
+			case _: args.push(pos);
+		}
+		return macro @:pos(ethis.pos) {
+			var assertion = tink.unit.Assert.expectCompilerError($a{args});
+			$ethis.emit(assertion);
+			assertion;
+		};
+	}
 	
 	public macro function assert(ethis:Expr, result:ExprOf<Bool>, ?description:ExprOf<String>, ?pos:ExprOf<haxe.PosInfos>):ExprOf<Assertion> {
 		var args = [result, description];
