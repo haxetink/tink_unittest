@@ -119,7 +119,7 @@ class TestBuilder {
 					case Success(_): $expr;
 					case Failure(e): cb(tink.core.Outcome.Failure(e));
 				}), macro cb(tink.core.Outcome.Success(tink.core.Noise.Noise.Noise)));
-				return macro tink.core.Future.async(function(cb) $expr);
+				return macro tink.core.Future #if (tink_core >= "2") .irreversible #else .async #end(function(cb) $expr);
 			}
 			
 			var ct = type.toComplex();
