@@ -43,8 +43,14 @@ class Assert {
 		}
 
 		var ok = error != null && (ereg == null || ereg.match(error));
+		
+		var args = [macro @:pos(expr.pos) $v{ok}, description];
+		switch pos {
+			case macro null: // skip
+			case v: args.push(v);
+		}
 
-		return macro tink.unit.Assert.assert($v{ok}, $description, $pos);
+		return macro tink.unit.Assert.assert($a{args});
 	}
 
 	public static macro function assert(expr:ExprOf<Bool>, ?description:ExprOf<String>, ?pos:ExprOf<haxe.PosInfos>):ExprOf<Assertion> {
