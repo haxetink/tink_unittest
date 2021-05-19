@@ -7,6 +7,7 @@ on:
 
 jobs:
   test:
+
     runs-on: ubuntu-latest
 
     strategy:
@@ -19,13 +20,16 @@ jobs:
           - master
         target: 
           - interp
-          - node
           - neko
           - python
-          - php
-          - cpp
+          - node
           - js
-          - java -D jvm
+          # - flash
+          # - java
+          # - cs
+          - cpp
+          - php
+          - lua
 
     steps:
     - name: Check out repo
@@ -85,8 +89,8 @@ jobs:
     - name: Cache Haxe
       uses: actions/cache@v1
       with:
-        path: ~/haxe
-        key: haxe
+        path: ${{ startsWith(runner.os, 'windows') && '%AppData%' || '~/haxe' }}
+        key: ${{ runner.os }}-haxe
         
     - name: Install Lix
       uses: lix-pm/setup-lix@master
