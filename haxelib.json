@@ -10,8 +10,8 @@
 		"kevinresol",
 		"back2dos"
 	],
-	"version": "0.7.0",
-	"releasenote": "TestBatch accepts rest arguments. Preserve top-down inference when transforming binop expr in Assert",
+	"version": "0.8.0",
+	"releasenote": "Add compiler error assertion and various bugs",
 	"tags": [],
 	"license": "MIT"
 }
