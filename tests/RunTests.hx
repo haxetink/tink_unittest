@@ -76,6 +76,24 @@ class RunTests {
 			})
 		);
 		
+		// Test: conditional
+		var runBoth = new ConditionTest(true, true);
+		var runOne = new ConditionTest(true, false);
+		var runNone = new ConditionTest(false, false);
+		futures.push(
+			function() return Runner.run(TestBatch.make([
+				runBoth,
+				runOne,
+				runNone,
+			])).map(function(result) {
+				assertEquals(0, result.summary().failures.length);
+				assertEquals('sbc1abc2ad', runBoth.result);
+				assertEquals('sbc1ad', runOne.result);
+				assertEquals('', runNone.result);
+				return Noise;
+			})
+		);
+		
 		var iter = futures.iterator();
 		function next() {
 			if(iter.hasNext()) iter.next()().handle(next);
@@ -271,6 +289,41 @@ class IncludeTest {
 
 	public function skip() {
 		debug('skip');
+		return assert(true);
+	}
+}
+
+class ConditionTest {
+	public var result:String;
+	
+	var run1:Bool;
+	var run2:Bool;
+	
+	public function new(run1, run2) {
+		this.run1 = run1;
+		this.run2 = run2;
+		result = '';
+	}
+	
+	function debug(msg:String) {
+		result += msg;
+		return Noise;
+	}
+	
+	@:before public function before() return debug('b');
+	@:after public function after() return debug('a');
+	@:setup public function setup() return debug('s');
+	@:teardown public function teardown() return debug('d');
+		
+	@:condition(this.run1)
+	public function conditional1() {
+		debug('c1');
+		return assert(true);
+	}
+	
+	@:condition(this.run2)
+	public function conditional2() {
+		debug('c2');
 		return assert(true);
 	}
 }

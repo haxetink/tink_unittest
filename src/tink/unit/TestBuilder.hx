@@ -48,6 +48,7 @@ class TestBuilder {
 							timeout: field.timeout,
 							exclude: field.exclude,
 							include: field.include,
+							condition: field.condition,
 							pos: transformPos(field.field.pos, {methodName: fname, className: cname}),
 							runnable: macro @:pos(field.field.pos) function():tink.testrunner.Assertions return target.$fname($a{args}),
 						});
@@ -62,6 +63,7 @@ class TestBuilder {
 								timeout: field.timeout,
 								exclude: field.exclude,
 								include: field.include,
+								condition: field.condition,
 								pos: transformPos(v.pos, {methodName: fname, className: cname}),
 								runnable: macro @:pos(field.field.pos) function():tink.testrunner.Assertions return target.$fname($a{args}),
 							});
@@ -106,7 +108,7 @@ class TestBuilder {
 						methodName: $v{caze.pos.methodName},
 						className: $v{caze.pos.className},
 					}
-					new tink.unit.TestCase($info, ${caze.runnable}, $v{caze.timeout}, $v{caze.include}, $v{caze.exclude}, pos);
+					new tink.unit.TestCase($info, ${caze.runnable}, $v{caze.timeout}, $v{caze.include}, $v{caze.exclude} || !${caze.condition}, pos);
 				});
 			}
 			
@@ -127,6 +129,7 @@ class TestBuilder {
 			var def = macro class $clsname extends tink.unit.TestSuite.TestSuiteBase<$ct> {
 				
 				public function new(target:$ct, ?name:String) {
+					this.target = target;
 					super({
 						name: name == null ? $v{info.name} : name,
 						pos: {
@@ -136,7 +139,6 @@ class TestBuilder {
 							className: $v{pos.className},
 						}
 					} , $a{tinkCases});
-					this.target = target;
 				}
 			}
 			
@@ -215,19 +217,20 @@ class TestBuilder {
 					case v: [for(v in v) v.params[0].getString().sure()].join('\n');
 				}
 				var timeout = getTimeout(field.meta, clstimeout);
+				
+				function subst(e:Expr)
+					return switch e {
+						case macro this.$field: 
+							macro @:pos(e.pos) @:privateAccess this.target.$field;
+						case macro this: 
+							macro @:pos(e.pos) @:privateAccess this.target;
+						default:
+							e.map(subst);
+					}
+				var condition = getCondition(field.meta, subst);
 				var variants = switch field.meta.extract(':variant') {
 					case []: [];
 					case v: 
-						function subst(e:Expr)
-							return switch e {
-								case macro this.$field: 
-									macro @:pos(e.pos) @:privateAccess this.target.$field;
-								case macro this: 
-									macro @:pos(e.pos) @:privateAccess this.target;
-								default:
-									e.map(subst);
-							}
-						
 						var ret = [];
 						for(v in v) {
 							var desc, args;
@@ -271,6 +274,7 @@ class TestBuilder {
 					kind: kind,
 					include: include,
 					exclude: exclude,
+					condition: condition,
 					variants: variants,
 					bufferIndex: bufferIndex,
 					description: description,
@@ -289,9 +293,16 @@ class TestBuilder {
 		return infos.get(type);
 	}
 	
-	static function getTimeout(meta:MetaAccess, def:Int)
+	static function getCondition(meta:MetaAccess, substThis:Expr->Expr)
+		return switch meta.extract(':condition') {
+			case []: macro true;
+			case [{params: [expr]}]: substThis(expr);
+			case p: p[0].pos.error('Multiple @:condition meta');
+		} 
+	
+	static function getTimeout(meta:MetaAccess, defaultValue:Int)
 		return switch meta.extract(':timeout') {
-			case []: def;
+			case []: defaultValue;
 			case [v]: switch v.params {
 					case [{expr: EConst(CInt(i))}]: Std.parseInt(i);
 					case [{pos: pos}]: pos.error('Expected integer parameter for @:timeout');
@@ -333,6 +344,7 @@ private typedef TestInfo = {
 		kind:Kind,
 		include:Bool,
 		exclude:Bool,
+		condition:Expr,
 		variants:Array<{description:String, pos:Position, args:Array<Expr>}>,
 		bufferIndex:Int,
 		description:String,
