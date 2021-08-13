@@ -70,9 +70,8 @@ abstract AssertionBuffer(Impl) from Impl to Assertions {
 	public inline function emit(assertion:Assertion)
 		this.yield(Data(assertion));
 		
-	public inline function fail(?code:Int, reason:FailingReason, ?pos:haxe.PosInfos):AssertionBuffer {
-		if(code == null) code = reason.code;
-		this.yield(Fail(new Error(code, reason.message, pos)));
+	public inline function fail(reason:FailingReason, ?pos:haxe.PosInfos):AssertionBuffer {
+		this.yield(Fail(reason));
 		return this;
 	}
 	
@@ -89,7 +88,7 @@ abstract AssertionBuffer(Impl) from Impl to Assertions {
 	public function handle<T>(outcome:Outcome<T, Error>)
 		switch outcome {
 			case Success(_): done();
-			case Failure(e): fail(e.code, e);
+			case Failure(e): fail(e);
 		}
 	#end
 }
