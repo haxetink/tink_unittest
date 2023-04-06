@@ -5,6 +5,7 @@ import haxe.macro.Type;
 import haxe.macro.Expr;
 
 using Lambda;
+using StringTools;
 using tink.CoreApi;
 #if macro
 import tink.macro.BuildCache;
@@ -293,7 +294,7 @@ class TestBuilder {
 		return switch meta.extract(':timeout') {
 			case []: def;
 			case [v]: switch v.params {
-					case [{expr: EConst(CInt(i))}]: Std.parseInt(i);
+					case [{expr: EConst(CInt(i))}]: Std.parseInt(i.replace("_", ""));
 					case [{pos: pos}]: pos.error('Expected integer parameter for @:timeout');
 					default: v.pos.error('Expected exactly one parameter for @:timeout');
 				}
