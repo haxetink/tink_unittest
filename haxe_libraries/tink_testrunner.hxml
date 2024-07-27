@@ -1,6 +1,7 @@
-# @install: lix --silent download "gh://github.com/haxetink/tink_testrunner#e8dbb790838544c66f92538da039e7027e8f1cf8" into tink_testrunner/0.9.0/github/e8dbb790838544c66f92538da039e7027e8f1cf8
+# @install: lix --silent download "gh://github.com/haxetink/tink_testrunner#e8f70026f16bf179cd8c0113bcef1d72f1075bd1" into tink_testrunner/0.9.0/github/e8f70026f16bf179cd8c0113bcef1d72f1075bd1
 -lib ansi
 -lib tink_macro
 -lib tink_streams
--cp ${HAXE_LIBCACHE}/tink_testrunner/0.9.0/github/e8dbb790838544c66f92538da039e7027e8f1cf8/src
+-cp ${HAXE_LIBCACHE}/tink_testrunner/0.9.0/github/e8f70026f16bf179cd8c0113bcef1d72f1075bd1/src
 -D tink_testrunner=0.9.0
+--macro addGlobalMetadata('ANSI.Attribute', "@:native('ANSIAttribute')", false)
