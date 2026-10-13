@@ -46,6 +46,7 @@ class RunTests {
 				abs,
 				benchmark,
 				new StringificationTest(),
+				new ShortCircuitTest(),
 			])).map(function(result) {
 				assertEquals(0, result.summary().failures.length);
 				assertEquals('ss2bb2issue24aa2bb2syncaa2bb2syncAssertaa2bb2asyncaa2bb2asyncAssertaa2bb2timeoutaa2bb2nestedDescriptionsaa2bb2multiAssertaa2bb2variant1aa2bb2variant2aa2bb2variant3aa2bb2variant21aa2dd2', normal.result);
@@ -374,6 +375,52 @@ class StringificationTest {
 		var c = new CastableToString(1);
 		asserts.assert(c == 'Value=1');
 		asserts.assert(c == 1);
+		return asserts.done();
+	}
+}
+
+@:asserts
+class ShortCircuitTest {
+	public function new() {}
+
+	public function or() {
+		var calls = 0;
+		function right():Bool {
+			calls++;
+			return true;
+		}
+		var left = true;
+		asserts.assert(left || right());
+		asserts.assert(calls == 0);
+
+		var x:Null<{f:Bool}> = null;
+		try asserts.assert(x == null || x.f)
+		catch (e:Dynamic) return asserts.fail(Std.string(e));
+
+		var present:Null<{f:Bool}> = {f: true};
+		asserts.assert(present == null || present.f);
+		return asserts.done();
+	}
+
+	public function and() {
+		var calls = 0;
+		function right():Bool {
+			calls++;
+			return true;
+		}
+		var left = false;
+		var failed = assert(left && right());
+		asserts.assert(calls == 0);
+		asserts.assert(!failed.holds);
+
+		var x:Null<{f:Bool}> = null;
+		try {
+			failed = assert(x != null && x.f);
+			asserts.assert(!failed.holds);
+		} catch (e:Dynamic) return asserts.fail(Std.string(e));
+
+		var present:Null<{f:Bool}> = {f: true};
+		asserts.assert(present != null && present.f);
 		return asserts.done();
 	}
 }

@@ -72,7 +72,8 @@ class Assert {
 
 				// TODO: we can actually do a recursive breakdown: e.g. `a == 1 && b == 2`
 				switch expr {
-					case {expr: EBinop(op, e1, e2), pos: pos}:
+					// `&&` and `||` short-circuit. Hoisting both sides for the message would evaluate the right-hand side unconditionally (`x == null || x.f`).
+					case {expr: EBinop(op, e1, e2), pos: pos} if (!isShortCircuit(op)):
 						switch Context.typeExpr(expr) { // type it as a whole to preserve top-down inference
 							case t_expr = {expr: TBinop(t_op, t_e1, t_e2) | TCast({expr: TBinop(t_op, t_e1, t_e2)}, _)}:
 								var stored = Context.storeTypedExpr(t_expr);
@@ -176,6 +177,12 @@ class Assert {
 	}
 	
 	#if macro
+	static function isShortCircuit(op:Binop)
+		return switch op {
+			case OpBoolAnd | OpBoolOr: true;
+			default: false;
+		}
+
 	static function stringify(e:Expr, t:haxe.macro.Type) {
 		return switch t {
 			case _.getID() => 'String':
